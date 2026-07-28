@@ -5,10 +5,11 @@
     "start": "vite build && electrobun dev",
     "dev:watch": "electrobun dev --watch",
     "dev:hmr": "concurrently \"bun run hmr\" \"bun run start\"",
+    "dev:cef": "ELECTROBUN_APP_STARTER_DESKTOP_RENDERER=cef ELECTROBUN_APP_STARTER_CDP_PORT=9222 bun run dev:hmr",
     "hmr": "vite --port 5173",
     "build:view": "NODE_OPTIONS=--max-old-space-size=4096 vite build",
-    "build:canary": "bun run build:view && electrobun build --env=canary",
-    "build:stable": "bun run build:view && electrobun build --env=stable"
+    "build:canary": "bun run build:view && ELECTROBUN_APP_STARTER_DESKTOP_RENDERER=system ELECTROBUN_APP_STARTER_CDP_PORT= electrobun build --env=canary",
+    "build:stable": "bun run build:view && ELECTROBUN_APP_STARTER_DESKTOP_RENDERER=system ELECTROBUN_APP_STARTER_CDP_PORT= electrobun build --env=stable"
   },
   "dependencies": {
     "@dayflow/blossom-color-picker-react": "^1.2.1",

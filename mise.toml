@@ -34,6 +34,10 @@ run = ["mise install", "bun install"]
 description = "Run the desktop app (Vite HMR on :5173; restart to pick up bun-process changes)"
 run = "bun run dev"
 
+[tasks."dev:cef"]
+description = "Run the desktop app with CEF + local CDP diagnostic access on :9222"
+run = "bun run dev:cef"
+
 [tasks.test]
 description = "Run all Bun tests"
 run = "bun run test"

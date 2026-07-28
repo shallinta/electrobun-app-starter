@@ -1,5 +1,7 @@
 import type { ElectrobunConfig } from "electrobun";
 
+import { resolveMacRendererConfig } from "./src/config/renderer";
+
 import packageJson from "./package.json";
 
 // Local-testing escape hatches — CI leaves all of these unset:
@@ -15,6 +17,10 @@ const RELEASE_DOWNLOADS =
 const updateBaseUrl =
   Bun.env.ELECTROBUN_APP_STARTER_UPDATE_BASE_URL ??
   `${RELEASE_DOWNLOADS}/updates`;
+const macRendererConfig = resolveMacRendererConfig({
+  renderer: Bun.env.ELECTROBUN_APP_STARTER_DESKTOP_RENDERER,
+  cdpPort: Bun.env.ELECTROBUN_APP_STARTER_CDP_PORT,
+});
 
 export default {
   app: {
@@ -37,7 +43,7 @@ export default {
       // ELECTROBUN_DEVELOPER_ID + App Store Connect API key env vars (CI).
       codesign: !skipSigning,
       notarize: !skipNotarize,
-      bundleCEF: false,
+      ...macRendererConfig,
       icons: "icon.iconset",
     },
     linux: {

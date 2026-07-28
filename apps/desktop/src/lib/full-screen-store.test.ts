@@ -88,6 +88,40 @@ test("notifies subscribers only when a full-screen value changes", () => {
   unsubscribe();
 });
 
+test("does not let an older initial response overwrite a message", async () => {
+  let resolveInitial:
+    | ((value: { fullScreen: boolean }) => void)
+    | undefined;
+  const initial = new Promise<{ fullScreen: boolean }>((resolve) => {
+    resolveInitial = resolve;
+  });
+  let messageHandler:
+    | ((payload: { fullScreen: boolean }) => void)
+    | undefined;
+  const rpc: FullScreenRPC = {
+    request: {
+      isFullScreen: () => initial,
+    },
+    addMessageListener: (_message, listener) => {
+      messageHandler = listener;
+    },
+    removeMessageListener: () => undefined,
+  };
+  const store = createFullScreenStore(rpc);
+  let notifications = 0;
+  const unsubscribe = store.subscribe(() => {
+    notifications += 1;
+  });
+
+  messageHandler?.({ fullScreen: true });
+  resolveInitial?.({ fullScreen: false });
+  await Promise.resolve();
+
+  expect(store.getSnapshot()).toBe(true);
+  expect(notifications).toBe(1);
+  unsubscribe();
+});
+
 test("ignores an initial response from an ended subscription generation", async () => {
   const pending: {
     promise: Promise<{ fullScreen: boolean }>;

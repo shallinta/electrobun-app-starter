@@ -19,6 +19,7 @@ export interface DesktopAppRuntime {
 
 export async function startDesktopApp(): Promise<DesktopAppRuntime> {
   let mainWindow: ManagedMainWindow | null = null;
+  let browserWindow: BrowserWindow | null = null;
   let rpc: MainWindowRPC | null = null;
 
   const getRpc = (): MainWindowRPC => {
@@ -26,8 +27,8 @@ export async function startDesktopApp(): Promise<DesktopAppRuntime> {
     return rpc;
   };
   const getMainWindow = (): BrowserWindow => {
-    if (!mainWindow) throw new Error("Main window is not ready.");
-    return mainWindow.window;
+    if (!browserWindow) throw new Error("Main window is not ready.");
+    return browserWindow;
   };
 
   const updater = new UpdaterService((message) =>
@@ -62,6 +63,9 @@ export async function startDesktopApp(): Promise<DesktopAppRuntime> {
     mainWindow = await createMainWindow({
       rpc,
       executeCommand,
+      onWindowCreated: (window) => {
+        browserWindow = window;
+      },
       onFullScreenChange: (fullScreen) =>
         getRpc().send.fullScreenChanged({ fullScreen }),
     });

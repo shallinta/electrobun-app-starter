@@ -22,6 +22,7 @@ export interface FullScreenStore {
 export function createFullScreenStore(rpc: FullScreenRPC): FullScreenStore {
   let snapshot = false;
   let generation = 0;
+  let messageVersion = 0;
   const listeners = new Set<() => void>();
   const update = (fullScreen: boolean): void => {
     if (fullScreen === snapshot) return;
@@ -32,11 +33,15 @@ export function createFullScreenStore(rpc: FullScreenRPC): FullScreenStore {
     fullScreen,
   }: {
     fullScreen: boolean;
-  }): void => update(fullScreen);
+  }): void => {
+    messageVersion += 1;
+    update(fullScreen);
+  };
 
   const start = (): void => {
     const activeGeneration = ++generation;
     rpc.addMessageListener("fullScreenChanged", handleFullScreenChanged);
+    const initialMessageVersion = messageVersion;
     let initial: Promise<{ fullScreen: boolean }>;
     try {
       initial = rpc.request.isFullScreen({});
@@ -45,7 +50,13 @@ export function createFullScreenStore(rpc: FullScreenRPC): FullScreenStore {
     }
     void initial
       .then(({ fullScreen }) => {
-        if (generation !== activeGeneration || listeners.size === 0) return;
+        if (
+          generation !== activeGeneration ||
+          listeners.size === 0 ||
+          messageVersion !== initialMessageVersion
+        ) {
+          return;
+        }
         update(fullScreen);
       })
       .catch(() => undefined);

@@ -45,10 +45,12 @@ export interface ManagedMainWindow {
 export async function createMainWindow({
   rpc,
   executeCommand,
+  onWindowCreated,
   onFullScreenChange,
 }: {
   rpc: MainWindowRPC;
   executeCommand: (command: Command, window: BrowserWindow) => void;
+  onWindowCreated?: (window: BrowserWindow) => void;
   onFullScreenChange?: (isFullScreen: boolean) => void;
 }): Promise<ManagedMainWindow> {
   const url = await getMainViewUrl();
@@ -64,6 +66,7 @@ export async function createMainWindow({
     trafficLightOffset: { x: 2, y: 16 },
     frame: savedFrame,
   });
+  onWindowCreated?.(window);
 
   const statePersistence = attachWindowStates(window, {
     isMaximized: getWindowMaximized(windowState),

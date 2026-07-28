@@ -1,4 +1,6 @@
-const FEATURE_MARKER = /<!--\s*feature:\s*([a-z0-9][a-z0-9-]*)\s*-->/g;
+const FEATURE_MARKER_CANDIDATE = /<!--\s*feature\b[\s\S]*?-->/g;
+const VALID_FEATURE_MARKER =
+  /^<!--\s*feature:\s*([a-z0-9]+(?:-[a-z0-9]+)*)\s*-->$/;
 
 const CHINESE_LABELS = [
   "功能：",
@@ -23,6 +25,12 @@ interface FeatureEntry {
   body: string;
 }
 
+interface FeatureMarker {
+  id: string;
+  index: number;
+  length: number;
+}
+
 function _escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
@@ -31,18 +39,34 @@ function _parseCatalog(
   content: string,
   catalogName: CatalogName
 ): FeatureEntry[] {
-  const matches = [...content.matchAll(FEATURE_MARKER)];
+  const markers: FeatureMarker[] = [
+    ...content.matchAll(FEATURE_MARKER_CANDIDATE),
+  ].map((candidate) => {
+    const validMarker = VALID_FEATURE_MARKER.exec(candidate[0]);
 
-  if (matches.length === 0) {
+    if (!validMarker) {
+      throw new Error(
+        `${catalogName} feature catalog contains an invalid feature marker`
+      );
+    }
+
+    return {
+      id: validMarker[1]!,
+      index: candidate.index ?? 0,
+      length: candidate[0].length,
+    };
+  });
+
+  if (markers.length === 0) {
     throw new Error(`${catalogName} feature catalog has no feature entries`);
   }
 
-  return matches.map((match, index) => {
-    const bodyStart = (match.index ?? 0) + match[0].length;
-    const bodyEnd = matches[index + 1]?.index ?? content.length;
+  return markers.map((marker, index) => {
+    const bodyStart = marker.index + marker.length;
+    const bodyEnd = markers[index + 1]?.index ?? content.length;
 
     return {
-      id: match[1]!,
+      id: marker.id,
       body: content.slice(bodyStart, bodyEnd),
     };
   });
@@ -64,11 +88,9 @@ function _verifyCatalog(
     seen.add(entry.id);
 
     for (const label of labels) {
-      const fieldPattern = new RegExp(
-        `^\\s*-\\s+\\*\\*${_escapeRegExp(label)}\\*\\*`,
-        "gm"
-      );
-      const fieldCount = entry.body.match(fieldPattern)?.length ?? 0;
+      const fieldPrefix = `^\\s*-\\s+\\*\\*${_escapeRegExp(label)}\\*\\*`;
+      const fieldLinePattern = new RegExp(`${fieldPrefix}[^\\r\\n]*$`, "gm");
+      const fieldCount = entry.body.match(fieldLinePattern)?.length ?? 0;
 
       if (fieldCount === 0) {
         throw new Error(
@@ -78,6 +100,16 @@ function _verifyCatalog(
       if (fieldCount !== 1) {
         throw new Error(
           `${catalogName} feature "${entry.id}" must contain required label "${label}" exactly once (found ${fieldCount})`
+        );
+      }
+
+      const populatedFieldPattern = new RegExp(
+        `${fieldPrefix}[ \\t]*\\S[^\\r\\n]*$`,
+        "gm"
+      );
+      if (!populatedFieldPattern.test(entry.body)) {
+        throw new Error(
+          `${catalogName} feature "${entry.id}" has an empty required label "${label}"`
         );
       }
     }

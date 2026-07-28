@@ -76,6 +76,15 @@ describe("verifyFeatureDocs", () => {
     ).toThrow('Chinese feature catalog repeats feature ID "typed-rpc"');
   });
 
+  test.each(["<!-- feature: extra_item -->", "<!-- feature extra-item -->"])(
+    "rejects malformed feature marker %s",
+    (marker) => {
+      expect(() =>
+        verifyFeatureDocs(`${CHINESE_ENTRY}\n${marker}`, ENGLISH_ENTRY)
+      ).toThrow("Chinese feature catalog contains an invalid feature marker");
+    }
+  );
+
   test("rejects an entry missing a required localized label", () => {
     expect(() =>
       verifyFeatureDocs(
@@ -139,6 +148,34 @@ describe("verifyFeatureDocs", () => {
     (catalogName, chinese, english, label) => {
       expect(() => verifyFeatureDocs(chinese, english)).toThrow(
         `${catalogName} feature "typed-rpc" must contain required label "${label}" exactly once`
+      );
+    }
+  );
+
+  test.each([
+    [
+      "Chinese",
+      CHINESE_ENTRY.replace(
+        "- **功能：** 在 Bun 与渲染进程之间共享类型安全契约。",
+        "- **功能：**   "
+      ),
+      ENGLISH_ENTRY,
+      "功能：",
+    ],
+    [
+      "English",
+      CHINESE_ENTRY,
+      ENGLISH_ENTRY.replace(
+        "- **Capability:** Shares a type-safe contract between Bun and the renderer.",
+        "- **Capability:**"
+      ),
+      "Capability:",
+    ],
+  ])(
+    "rejects an empty required field in the %s catalog",
+    (catalogName, chinese, english, label) => {
+      expect(() => verifyFeatureDocs(chinese, english)).toThrow(
+        `${catalogName} feature "typed-rpc" has an empty required label "${label}"`
       );
     }
   );

@@ -112,6 +112,36 @@ export function createDeepLinkBuffer({
   const pending: URL[] = [];
   const pendingHrefs = new Set<string>();
   let handler: ((url: URL) => void) | undefined;
+  let isFlushing = false;
+
+  const flushPending = (): void => {
+    if (isFlushing) {
+      return;
+    }
+
+    isFlushing = true;
+
+    try {
+      while (pending.length > 0) {
+        const activeHandler = handler;
+
+        if (!activeHandler) {
+          return;
+        }
+
+        const url = pending.shift();
+
+        if (!url) {
+          return;
+        }
+
+        pendingHrefs.delete(url.href);
+        _deliver(activeHandler, url);
+      }
+    } finally {
+      isFlushing = false;
+    }
+  };
 
   return {
     capture(raw) {
@@ -151,13 +181,7 @@ export function createDeepLinkBuffer({
 
     setHandler(nextHandler) {
       handler = nextHandler;
-
-      const captured = pending.splice(0);
-      pendingHrefs.clear();
-
-      for (const url of captured) {
-        _deliver(nextHandler, url);
-      }
+      flushPending();
     },
 
     clearHandler() {

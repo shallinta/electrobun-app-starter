@@ -130,6 +130,41 @@ describe("createDeepLinkBuffer", () => {
     expect(replacementHandler).toEqual([]);
   });
 
+  test("uses a replacement handler for the rest of a reentrant flush", () => {
+    const buffer = createDeepLinkBuffer({ rules: RULES });
+    const firstHandler: string[] = [];
+    const replacementHandler: string[] = [];
+
+    buffer.capture("starter://open/items/1");
+    buffer.capture("starter://open/items/2");
+    buffer.setHandler((url) => {
+      firstHandler.push(url.pathname);
+      buffer.setHandler((nextUrl) => replacementHandler.push(nextUrl.pathname));
+    });
+
+    expect(firstHandler).toEqual(["/items/1"]);
+    expect(replacementHandler).toEqual(["/items/2"]);
+  });
+
+  test("keeps the rest pending when a handler clears during flush", () => {
+    const buffer = createDeepLinkBuffer({ rules: RULES });
+    const firstHandler: string[] = [];
+    const replacementHandler: string[] = [];
+
+    buffer.capture("starter://open/items/1");
+    buffer.capture("starter://open/items/2");
+    buffer.setHandler((url) => {
+      firstHandler.push(url.pathname);
+      buffer.clearHandler();
+    });
+
+    expect(firstHandler).toEqual(["/items/1"]);
+
+    buffer.setHandler((url) => replacementHandler.push(url.pathname));
+
+    expect(replacementHandler).toEqual(["/items/2"]);
+  });
+
   test("delivers warm links immediately to the current handler", () => {
     const buffer = createDeepLinkBuffer({ rules: RULES });
     const firstHandler: string[] = [];

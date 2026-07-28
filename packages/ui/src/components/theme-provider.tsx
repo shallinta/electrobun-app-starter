@@ -10,6 +10,13 @@ import {
   type ReactNode,
 } from "react";
 
+import {
+  LOCAL_STORAGE_KEYS,
+  readLocalStorage,
+  removeLocalStorage,
+  writeLocalStorage,
+} from "../lib/local-storage";
+
 /** User-selectable appearance. `"system"` follows the OS color scheme. */
 export type Theme = "light" | "dark" | "system";
 /** The concrete scheme actually applied to the document. */
@@ -17,14 +24,6 @@ export type ResolvedTheme = "light" | "dark";
 
 /** Accent (as `#rrggbb`) used when nothing is stored — the base `--primary` blue. */
 export const DEFAULT_PRIMARY = "#5e80ee";
-
-/**
- * localStorage keys for the persisted appearance. Kept in sync with the
- * anti-FOUC bootstrap script in `mainview/index.html`, which reads the same
- * keys to apply appearance before React mounts — change both together.
- */
-export const THEME_STORAGE_KEY = "electrobun-app-starter-theme";
-export const PRIMARY_STORAGE_KEY = "electrobun-app-starter-primary";
 
 interface ThemeContextValue {
   theme: Theme;
@@ -45,20 +44,22 @@ interface PrimaryColorContextValue {
 // only read `resolvedTheme`. Keeping accent in its own context avoids unrelated
 // re-renders while the color picker is dragged.
 const ThemeContext = createContext<ThemeContextValue | null>(null);
-const PrimaryColorContext = createContext<PrimaryColorContextValue | null>(null);
+const PrimaryColorContext = createContext<PrimaryColorContextValue | null>(
+  null
+);
 
 const DARK_QUERY = "(prefers-color-scheme: dark)";
 const HEX_RE = /^#[0-9a-fA-F]{6}$/;
 
 function _readStoredTheme(): Theme {
-  const stored = localStorage.getItem(THEME_STORAGE_KEY);
+  const stored = readLocalStorage(LOCAL_STORAGE_KEYS.theme);
   return stored === "light" || stored === "dark" || stored === "system"
     ? stored
     : "dark";
 }
 
 function _readStoredPrimary(): string {
-  const stored = localStorage.getItem(PRIMARY_STORAGE_KEY);
+  const stored = readLocalStorage(LOCAL_STORAGE_KEYS.primaryColor);
   return stored && HEX_RE.test(stored) ? stored : DEFAULT_PRIMARY;
 }
 
@@ -105,27 +106,25 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   );
 
   const [primaryColor, setPrimaryState] = useState<string>(_readStoredPrimary);
-  const [hasPrimaryColorOverride, setHasPrimaryColorOverride] = useState(
-    () => {
-      const stored = localStorage.getItem(PRIMARY_STORAGE_KEY);
-      return Boolean(stored && HEX_RE.test(stored));
-    }
-  );
+  const [hasPrimaryColorOverride, setHasPrimaryColorOverride] = useState(() => {
+    const stored = readLocalStorage(LOCAL_STORAGE_KEYS.primaryColor);
+    return Boolean(stored && HEX_RE.test(stored));
+  });
   const [resetPrimaryColorVersion, setResetPrimaryColorVersion] = useState(0);
 
   const setTheme = useCallback((next: Theme) => {
-    localStorage.setItem(THEME_STORAGE_KEY, next);
+    writeLocalStorage(LOCAL_STORAGE_KEYS.theme, next);
     setThemeState(next);
   }, []);
 
   const setPrimaryColor = useCallback((next: string) => {
-    localStorage.setItem(PRIMARY_STORAGE_KEY, next);
+    writeLocalStorage(LOCAL_STORAGE_KEYS.primaryColor, next);
     setHasPrimaryColorOverride(true);
     setPrimaryState(next);
   }, []);
 
   const resetPrimaryColor = useCallback(() => {
-    localStorage.removeItem(PRIMARY_STORAGE_KEY);
+    removeLocalStorage(LOCAL_STORAGE_KEYS.primaryColor);
     setHasPrimaryColorOverride(false);
     setPrimaryState(DEFAULT_PRIMARY);
     setResetPrimaryColorVersion((version) => version + 1);

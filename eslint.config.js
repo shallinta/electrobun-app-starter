@@ -53,6 +53,7 @@ export default defineConfig([
   pluginReactHooks.configs.flat["recommended-latest"],
   {
     settings: {
+      "import-x/core-modules": ["bun:test"],
       react: {
         version: "19.0",
       },

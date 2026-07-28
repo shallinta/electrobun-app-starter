@@ -7,9 +7,9 @@
     <script>
       // Apply the persisted appearance before first paint to avoid a flash of
       // the wrong theme/accent. Mirrors the logic in
-      // theme-provider.tsx — keep the storage keys
+      // theme-provider.tsx — keep these literals synchronized with
+      // LOCAL_STORAGE_KEYS in packages/ui/src/lib/local-storage.ts:
       // ("electrobun-app-starter-theme", "electrobun-app-starter-primary")
-      // in sync.
       (function () {
         try {
           var root = document.documentElement;

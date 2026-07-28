@@ -53,3 +53,27 @@ test("adds disabled File menu placeholders before Edit", () => {
     { label: "Open...", enabled: false },
   ]);
 });
+
+test("adds Toggle Sidebar first in the View menu", () => {
+  menuModule.registerMenuActions({} as never, () => undefined);
+
+  const latestMenu = menus[menus.length - 1] as {
+    label?: string;
+    submenu?: {
+      label?: string;
+      action?: string;
+      accelerator?: string;
+      type?: string;
+    }[];
+  }[];
+  const viewMenu = latestMenu.find(({ label }) => label === "View");
+
+  expect(viewMenu?.submenu?.slice(0, 2)).toEqual([
+    {
+      label: "Toggle Sidebar",
+      action: "toggleSidebar",
+      accelerator: "CommandOrControl+B",
+    },
+    { type: "divider" },
+  ]);
+});

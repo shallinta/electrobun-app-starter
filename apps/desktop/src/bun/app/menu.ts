@@ -80,6 +80,12 @@ function buildMenu(
       label: "View",
       submenu: [
         {
+          label: "Toggle Sidebar",
+          action: "toggleSidebar",
+          accelerator: "CommandOrControl+B",
+        },
+        { type: "divider" },
+        {
           label: "Command Palette...",
           action: "commandPalette",
           accelerator: "CommandOrControl+Shift+P",
@@ -146,6 +152,7 @@ export function setUpdateModeInMenu(mode: UpdateMode) {
 const MENU_ACTION_COMMANDS: Record<string, Command> = {
   settings: { type: "openSettings", args: {} },
   commandPalette: { type: "openCommandPalette", args: {} },
+  toggleSidebar: { type: "toggleSidebar", args: {} },
   reload: { type: "reload", args: {} },
   zoomIn: { type: "zoomIn", args: {} },
   zoomOut: { type: "zoomOut", args: {} },

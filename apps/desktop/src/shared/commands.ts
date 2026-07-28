@@ -12,6 +12,7 @@ export interface OpenSettingsCommand extends GenericCommand<
 > {}
 
 export interface OpenCommandPaletteCommand extends GenericCommand<"openCommandPalette"> {}
+export interface ToggleSidebarCommand extends GenericCommand<"toggleSidebar"> {}
 export interface ZoomInCommand extends GenericCommand<"zoomIn"> {}
 export interface ZoomOutCommand extends GenericCommand<"zoomOut"> {}
 export interface ResetZoomCommand extends GenericCommand<"resetZoom"> {}
@@ -28,6 +29,7 @@ export interface ApplyUpdateAndRestartCommand extends GenericCommand<"applyUpdat
 export type Command =
   | OpenSettingsCommand
   | OpenCommandPaletteCommand
+  | ToggleSidebarCommand
   | ZoomInCommand
   | ZoomOutCommand
   | ResetZoomCommand
@@ -48,6 +50,7 @@ export const COMMAND_META: Record<
 > = {
   openSettings: { label: "Settings", target: "webview" },
   openCommandPalette: { label: "Command Palette", target: "webview" },
+  toggleSidebar: { label: "Toggle Sidebar", target: "webview" },
   zoomIn: { label: "Zoom In", target: "bun" },
   zoomOut: { label: "Zoom Out", target: "bun" },
   resetZoom: { label: "Reset Zoom", target: "bun" },

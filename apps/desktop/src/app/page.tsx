@@ -11,11 +11,16 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { usePanelRef } from "react-resizable-panels";
 
 import { CommandProvider, useCommands, useRegisterCommands } from "@/commands";
 import { UpdateIndicator } from "@/components/update-indicator";
 import { UpdateStatusProvider } from "@/components/update-status-provider";
 import { electrobun } from "@/lib/electrobun";
+import {
+  persistSidebarSize,
+  readSidebarSize,
+} from "@/lib/sidebar-size";
 import type { SettingsTab } from "@/shared/commands";
 
 const SettingsDialog = lazy(() =>
@@ -51,6 +56,8 @@ function PageInner() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsTab, setSettingsTab] = useState<SettingsTab>("general");
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  const sidebarPanelRef = usePanelRef();
+  const initialSidebarSize = useRef(readSidebarSize()).current;
 
   useRegisterCommands({
     openSettings: ({ tab }) => {
@@ -58,6 +65,15 @@ function PageInner() {
       setSettingsOpen(true);
     },
     openCommandPalette: () => setCommandPaletteOpen(true),
+    toggleSidebar: () => {
+      const panel = sidebarPanelRef.current;
+      if (!panel) return;
+      if (panel.isCollapsed()) {
+        panel.expand();
+        return;
+      }
+      panel.collapse();
+    },
   });
 
   useEffect(() => {
@@ -73,8 +89,12 @@ function PageInner() {
         <ResizablePanelGroup>
           <ResizablePanel
             className="bg-sidebar flex items-center justify-center"
-            defaultSize="20%"
+            panelRef={sidebarPanelRef}
+            collapsible
+            collapsedSize={0}
+            defaultSize={initialSidebarSize}
             minSize={200}
+            onResize={({ inPixels }) => persistSidebarSize(inPixels)}
           >
             <span className="text-muted-foreground text-sm">
               Add your navigation here.

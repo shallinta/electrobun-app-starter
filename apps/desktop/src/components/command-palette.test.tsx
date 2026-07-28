@@ -69,3 +69,7 @@ test("hides check command while update mode is off", () => {
 
   expect(renderPalette()).not.toContain("Check for Updates");
 });
+
+test("shows the Toggle Sidebar command", () => {
+  expect(renderPalette()).toContain("Toggle Sidebar");
+});

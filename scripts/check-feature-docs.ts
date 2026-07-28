@@ -23,6 +23,10 @@ interface FeatureEntry {
   body: string;
 }
 
+function _escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 function _parseCatalog(
   content: string,
   catalogName: CatalogName
@@ -60,9 +64,20 @@ function _verifyCatalog(
     seen.add(entry.id);
 
     for (const label of labels) {
-      if (!entry.body.includes(label)) {
+      const fieldPattern = new RegExp(
+        `^\\s*-\\s+\\*\\*${_escapeRegExp(label)}\\*\\*`,
+        "gm"
+      );
+      const fieldCount = entry.body.match(fieldPattern)?.length ?? 0;
+
+      if (fieldCount === 0) {
         throw new Error(
           `${catalogName} feature "${entry.id}" is missing required label "${label}"`
+        );
+      }
+      if (fieldCount !== 1) {
+        throw new Error(
+          `${catalogName} feature "${entry.id}" must contain required label "${label}" exactly once (found ${fieldCount})`
         );
       }
     }
@@ -92,8 +107,8 @@ export function verifyFeatureDocs(chinese: string, english: string): void {
 async function _main(): Promise<void> {
   try {
     const [chinese, english] = await Promise.all([
-      Bun.file("docs/FEATURES.md").text(),
-      Bun.file("docs/FEATURES_EN.md").text(),
+      Bun.file(new URL("../docs/FEATURES.md", import.meta.url)).text(),
+      Bun.file(new URL("../docs/FEATURES_EN.md", import.meta.url)).text(),
     ]);
 
     verifyFeatureDocs(chinese, english);

@@ -28,6 +28,8 @@ jobs:
 
       - run: mise run check:lockfile
 
+      - run: mise run check:feature-docs
+
       - run: bun install --frozen-lockfile
 
       - run: mise run test

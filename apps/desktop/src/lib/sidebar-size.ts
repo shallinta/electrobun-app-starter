@@ -19,12 +19,13 @@ export function readSidebarSize(): number | string {
 }
 
 export function persistSidebarSize(sizeInPixels: number): void {
-  if (!Number.isFinite(sizeInPixels) || sizeInPixels <= 0) {
+  const roundedSize = Math.round(sizeInPixels);
+  if (!Number.isFinite(roundedSize) || roundedSize <= 0) {
     return;
   }
 
   writeLocalStorage(
     LOCAL_STORAGE_KEYS.sidebarSize,
-    String(Math.round(sizeInPixels))
+    String(roundedSize)
   );
 }

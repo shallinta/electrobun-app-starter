@@ -95,6 +95,15 @@ describe("persistSidebarSize", () => {
     expect(storage.getItem(LOCAL_STORAGE_KEYS.sidebarSize)).toBe("385");
   });
 
+  test("does not persist a subpixel size that rounds to zero", () => {
+    const storage = new MemoryStorage();
+    setWindowLocalStorage(storage);
+
+    persistSidebarSize(0.1);
+
+    expect(storage.getItem(LOCAL_STORAGE_KEYS.sidebarSize)).toBeNull();
+  });
+
   test.each([0, -1, Number.POSITIVE_INFINITY, Number.NaN])(
     "does not persist invalid pixel size %s",
     (value) => {

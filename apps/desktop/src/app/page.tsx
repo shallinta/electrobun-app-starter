@@ -57,7 +57,7 @@ function PageInner() {
   const [settingsTab, setSettingsTab] = useState<SettingsTab>("general");
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const sidebarPanelRef = usePanelRef();
-  const initialSidebarSize = useRef(readSidebarSize()).current;
+  const [defaultSidebarSize] = useState(readSidebarSize);
 
   useRegisterCommands({
     openSettings: ({ tab }) => {
@@ -92,7 +92,7 @@ function PageInner() {
             panelRef={sidebarPanelRef}
             collapsible
             collapsedSize={0}
-            defaultSize={initialSidebarSize}
+            defaultSize={defaultSidebarSize}
             minSize={200}
             onResize={({ inPixels }) => persistSidebarSize(inPixels)}
           >

@@ -17,10 +17,7 @@ import { CommandProvider, useCommands, useRegisterCommands } from "@/commands";
 import { UpdateIndicator } from "@/components/update-indicator";
 import { UpdateStatusProvider } from "@/components/update-status-provider";
 import { electrobun } from "@/lib/electrobun";
-import {
-  persistSidebarSize,
-  readSidebarSize,
-} from "@/lib/sidebar-size";
+import { persistSidebarSize, readSidebarSize } from "@/lib/sidebar-size";
 import type { SettingsTab } from "@/shared/commands";
 
 const SettingsDialog = lazy(() =>
@@ -129,7 +126,12 @@ function PageInner() {
         <CommandPalette
           open={commandPaletteOpen}
           onOpenChange={setCommandPaletteOpen}
-          blacklist={["openSettings", "openCommandPalette", "openLink"]}
+          blacklist={[
+            "openSettings",
+            "openCommandPalette",
+            "openLink",
+            "toggleMaximized",
+          ]}
         />
       </LazyMount>
     </div>

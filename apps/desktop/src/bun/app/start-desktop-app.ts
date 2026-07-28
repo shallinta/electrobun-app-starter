@@ -56,9 +56,15 @@ export async function startDesktopApp(): Promise<DesktopAppRuntime> {
   try {
     rpc = createMainWindowRPC({
       executeCommand: (command) => executeCommand(command, getMainWindow()),
+      getMainWindow,
       updater,
     });
-    mainWindow = await createMainWindow({ rpc, executeCommand });
+    mainWindow = await createMainWindow({
+      rpc,
+      executeCommand,
+      onFullScreenChange: (fullScreen) =>
+        getRpc().send.fullScreenChanged({ fullScreen }),
+    });
     void updater.start();
 
     const handleBeforeQuit = createShutdownCoordinator({

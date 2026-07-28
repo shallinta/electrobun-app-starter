@@ -17,6 +17,7 @@ export interface ZoomInCommand extends GenericCommand<"zoomIn"> {}
 export interface ZoomOutCommand extends GenericCommand<"zoomOut"> {}
 export interface ResetZoomCommand extends GenericCommand<"resetZoom"> {}
 export interface ReloadCommand extends GenericCommand<"reload"> {}
+export interface ToggleMaximizedCommand extends GenericCommand<"toggleMaximized"> {}
 
 export interface OpenLinkCommand extends GenericCommand<
   "openLink",
@@ -34,6 +35,7 @@ export type Command =
   | ZoomOutCommand
   | ResetZoomCommand
   | ReloadCommand
+  | ToggleMaximizedCommand
   | OpenLinkCommand
   | CheckForUpdatesCommand
   | ApplyUpdateAndRestartCommand;
@@ -55,6 +57,7 @@ export const COMMAND_META: Record<
   zoomOut: { label: "Zoom Out", target: "bun" },
   resetZoom: { label: "Reset Zoom", target: "bun" },
   reload: { label: "Reload", target: "bun" },
+  toggleMaximized: { label: "Toggle Maximize", target: "bun" },
   openLink: { label: "Open Link", target: "bun" },
   checkForUpdates: { label: "Check for Updates...", target: "bun" },
   applyUpdateAndRestart: { label: "Restart to Update", target: "bun" },

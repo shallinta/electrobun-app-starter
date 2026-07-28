@@ -12,6 +12,10 @@ export interface DesktopRPCType {
         params: Record<string, never>;
         response: string | null;
       };
+      isFullScreen: {
+        params: Record<string, never>;
+        response: { fullScreen: boolean };
+      };
     };
     messages: {
       executeCommand: Command;
@@ -22,6 +26,7 @@ export interface DesktopRPCType {
     messages: {
       updateStatusChanged: UpdateStatusChangedPayload;
       executeCommand: Command;
+      fullScreenChanged: { fullScreen: boolean };
     };
   }>;
 }

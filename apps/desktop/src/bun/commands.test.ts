@@ -59,3 +59,47 @@ describe("executeCommandInBun openLink", () => {
     }
   });
 });
+
+describe("executeCommandInBun toggleMaximized", () => {
+  test("maximizes a restored window", () => {
+    let maximized = false;
+    const window = {
+      isMaximized: () => maximized,
+      maximize: () => {
+        maximized = true;
+      },
+      unmaximize: () => {
+        maximized = false;
+      },
+    };
+
+    executeCommandInBun(
+      { type: "toggleMaximized", args: {} },
+      window as never,
+      createDependencies([])
+    );
+
+    expect(maximized).toBe(true);
+  });
+
+  test("restores a maximized window", () => {
+    let maximized = true;
+    const window = {
+      isMaximized: () => maximized,
+      maximize: () => {
+        maximized = true;
+      },
+      unmaximize: () => {
+        maximized = false;
+      },
+    };
+
+    executeCommandInBun(
+      { type: "toggleMaximized", args: {} },
+      window as never,
+      createDependencies([])
+    );
+
+    expect(maximized).toBe(false);
+  });
+});

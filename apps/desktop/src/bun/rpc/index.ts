@@ -1,4 +1,4 @@
-import { BrowserView } from "electrobun/bun";
+import { BrowserView, type BrowserWindow } from "electrobun/bun";
 
 import type { Command } from "../../shared/commands";
 import type { DesktopRPCType } from "../../shared/rpc";
@@ -10,6 +10,7 @@ export type MainWindowRPC = ReturnType<
 
 export interface MainWindowRPCDependencies {
   executeCommand: (command: Command) => void;
+  getMainWindow: () => BrowserWindow;
   updater: UpdaterService;
 }
 
@@ -17,6 +18,7 @@ const MAX_REQUEST_TIME_MS = 5 * 60_000 + 10_000;
 
 export function createMainWindowRPC({
   executeCommand,
+  getMainWindow,
   updater,
 }: MainWindowRPCDependencies): MainWindowRPC {
   return BrowserView.defineRPC<DesktopRPCType>({
@@ -29,6 +31,9 @@ export function createMainWindowRPC({
           return null;
         },
         pendingInstalledVersion: () => updater.getInstalledVersion(),
+        isFullScreen: () => ({
+          fullScreen: getMainWindow().isFullScreen(),
+        }),
       },
       messages: {
         executeCommand,

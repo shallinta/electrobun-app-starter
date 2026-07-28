@@ -28,13 +28,16 @@ export interface WindowStatePersistence {
   flush(): Promise<void>;
 }
 
+interface WindowStateOptions {
+  isMaximized?: boolean;
+  isFullScreen?: boolean;
+  zoom?: number;
+  onFullScreenChange?: (isFullScreen: boolean) => void;
+}
+
 export function createWindowStatePersistence(
   win: BrowserWindow,
-  options: {
-    isMaximized?: boolean;
-    isFullScreen?: boolean;
-    zoom?: number;
-  },
+  options: WindowStateOptions,
   dependencies: WindowStatePersistenceDependencies = DEFAULT_DEPENDENCIES
 ): WindowStatePersistence {
   let desiredZoom = options.zoom ?? 1;
@@ -82,10 +85,21 @@ export function createWindowStatePersistence(
   }
   if (desiredZoom !== 1) win.setPageZoom(desiredZoom);
 
+  let lastFullScreen = win.isFullScreen();
+  options.onFullScreenChange?.(lastFullScreen);
+  const handleResize = (): void => {
+    const isFullScreen = win.isFullScreen();
+    if (isFullScreen !== lastFullScreen) {
+      lastFullScreen = isFullScreen;
+      options.onFullScreenChange?.(isFullScreen);
+    }
+    scheduleFrameSave();
+  };
+
   win.on("close", persistFrame);
   app.on("before-quit", persistFrame);
   win.on("move", scheduleFrameSave);
-  win.on("resize", scheduleFrameSave);
+  win.on("resize", handleResize);
   win.webview?.on("dom-ready", () => {
     if (win.getPageZoom() !== desiredZoom) win.setPageZoom(desiredZoom);
   });
@@ -118,11 +132,7 @@ let activePersistence: WindowStatePersistence | undefined;
 
 export function attachWindowStates(
   win: BrowserWindow,
-  options: {
-    isMaximized?: boolean;
-    isFullScreen?: boolean;
-    zoom?: number;
-  }
+  options: WindowStateOptions
 ): WindowStatePersistence {
   activePersistence = createWindowStatePersistence(win, options);
   return activePersistence;

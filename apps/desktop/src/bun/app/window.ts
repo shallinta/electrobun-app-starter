@@ -45,9 +45,11 @@ export interface ManagedMainWindow {
 export async function createMainWindow({
   rpc,
   executeCommand,
+  onFullScreenChange,
 }: {
   rpc: MainWindowRPC;
   executeCommand: (command: Command, window: BrowserWindow) => void;
+  onFullScreenChange?: (isFullScreen: boolean) => void;
 }): Promise<ManagedMainWindow> {
   const url = await getMainViewUrl();
   const windowState = await loadWindowState();
@@ -67,6 +69,7 @@ export async function createMainWindow({
     isMaximized: getWindowMaximized(windowState),
     isFullScreen: getWindowFullScreen(windowState),
     zoom: savedZoom,
+    onFullScreenChange,
   });
   registerMenuActions(window, executeCommand);
   return {

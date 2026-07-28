@@ -76,3 +76,55 @@ test("flush forces debounced frame and zoom writes through one serial queue", as
   await flushed;
   expect(events).toEqual(["frame:start", "frame:end", "zoom:1.25"]);
 });
+
+test("reports the initial full-screen state and only subsequent changes", async () => {
+  const listeners = new Map<string, () => void>();
+  let fullScreen = false;
+  const win = {
+    getFrame: () => ({ x: 1, y: 2, width: 800, height: 600 }),
+    getPageZoom: () => 1,
+    isFullScreen: () => fullScreen,
+    isMaximized: () => false,
+    on: (event: string, listener: () => void) => listeners.set(event, listener),
+    setFullScreen: (value: boolean) => {
+      fullScreen = value;
+    },
+    maximize: () => undefined,
+    setPageZoom: () => undefined,
+    webview: { on: () => undefined },
+  };
+  const observed: boolean[] = [];
+  const create = windowStateModule.createWindowStatePersistence as unknown as (
+    window: typeof win,
+    options: { onFullScreenChange: (value: boolean) => void },
+    dependencies: {
+      saveFrame: (value: WindowFrame) => Promise<void>;
+      saveFullScreen: (value: boolean) => Promise<void>;
+      saveMaximized: (value: boolean) => Promise<void>;
+      saveZoom: (value: number) => Promise<void>;
+    }
+  ) => { flush(): Promise<void> };
+  const persistence = create(
+    win,
+    { onFullScreenChange: (value) => observed.push(value) },
+    {
+      saveFrame: () => Promise.resolve(),
+      saveFullScreen: () => Promise.resolve(),
+      saveMaximized: () => Promise.resolve(),
+      saveZoom: () => Promise.resolve(),
+    }
+  );
+
+  expect(observed).toEqual([false]);
+  listeners.get("resize")?.();
+  expect(observed).toEqual([false]);
+
+  fullScreen = true;
+  listeners.get("resize")?.();
+  expect(observed).toEqual([false, true]);
+
+  fullScreen = false;
+  listeners.get("resize")?.();
+  expect(observed).toEqual([false, true, false]);
+  await persistence.flush();
+});

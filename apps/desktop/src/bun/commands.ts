@@ -48,6 +48,13 @@ export function executeCommandInBun(
     case "reload":
       window.webview?.executeJavascript("location.reload()");
       return;
+    case "toggleMaximized":
+      if (window.isMaximized()) {
+        window.unmaximize();
+      } else {
+        window.maximize();
+      }
+      return;
     case "openLink": {
       let url: URL;
       try {

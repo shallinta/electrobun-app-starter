@@ -170,10 +170,11 @@ your product.
       `ELECTROBUN_APP_STARTER_DESKTOP_RENDERER` and
       `ELECTROBUN_APP_STARTER_CDP_PORT`.
 - [ ] Namespace browser persistence for the new product. Replace
-      `electrobun-app-starter-theme` and
-      `electrobun-app-starter-primary` together in
-      `packages/ui/src/components/theme-provider.tsx` and the pre-React bootstrap
-      in `apps/desktop/src/mainview/index.html`.
+      `electrobun-app-starter-theme`, `electrobun-app-starter-primary`, and
+      `electrobun-app-starter:sidebar-size` in
+      `packages/ui/src/lib/local-storage.ts`; also update the theme and primary
+      color keys used by the pre-React bootstrap in
+      `apps/desktop/src/mainview/index.html`.
 
 <!-- i18n: rebrand.repository-artifacts -->
 

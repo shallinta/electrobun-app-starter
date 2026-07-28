@@ -150,10 +150,10 @@ RPC 和命令边界扩展原生能力。
       `ELECTROBUN_APP_STARTER_DESKTOP_RENDERER` 与
       `ELECTROBUN_APP_STARTER_CDP_PORT`。
 - [ ] 为新产品隔离浏览器持久化数据。在
-      `packages/ui/src/components/theme-provider.tsx` 和
-      `apps/desktop/src/mainview/index.html` 的 React 启动前脚本中，同时替换
-      `electrobun-app-starter-theme` 和
-      `electrobun-app-starter-primary`。
+      `packages/ui/src/lib/local-storage.ts` 中替换
+      `electrobun-app-starter-theme`、`electrobun-app-starter-primary` 和
+      `electrobun-app-starter:sidebar-size`；同时更新
+      `apps/desktop/src/mainview/index.html` 的 React 启动前脚本中使用的主题与主色 key。
 
 <!-- i18n: rebrand.repository-artifacts -->
 

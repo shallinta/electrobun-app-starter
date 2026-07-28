@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+
+      # Nothing else parses the workflows, so a malformed release.yml would only
+      # surface as "Invalid workflow file" *after* a version tag was pushed — a
+      # tag with no release behind it. Fail the PR instead. (A block scalar whose
+      # body drifts to column 0 is the easy way to get here.)
+      - name: Validate workflow YAML
+        run: python3 -c "import glob, yaml; [yaml.safe_load(open(f)) for f in glob.glob('.github/workflows/*.yml')]"
+
+      # Reads mise.lock: installs the exact locked bun with checksum
+      # verification (auto `mise install --locked`).
+      - uses: jdx/mise-action@e6a8b3978addb5a52f2b4cd9d91eafa7f0ab959d # v4.2.0
+
+      - run: mise run check:lockfile
+
+      - run: bun install --frozen-lockfile
+
+      - run: mise run test
+
+      - run: mise run lint
+
+      - run: mise run typecheck
+
+      # `vite build` otherwise runs only inside a release build, so a renderer
+      # change that breaks — or just outgrows the runner's V8 heap — stays
+      # invisible until a version tag is pushed, and takes the release with it.
+      # (That is exactly how v0.1.1-canary.0 died: 14701 modules OOMing a ~2 GB
+      # default heap. build:view raises it; this step is what keeps it honest.)
+      - run: bun --filter @shallinta/desktop build:view

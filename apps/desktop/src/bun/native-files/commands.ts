@@ -2,11 +2,16 @@ import path from "node:path";
 
 const ABSOLUTE_PATH_ERROR = "An absolute path is required.";
 
-export function assertAbsolutePath(value: string): void {
-  if (
-    value.length === 0 ||
-    (!path.posix.isAbsolute(value) && !path.win32.isAbsolute(value))
-  ) {
+export function assertAbsolutePath(
+  value: string,
+  platform: NodeJS.Platform = process.platform
+): void {
+  const isAbsolute =
+    platform === "win32"
+      ? path.win32.isAbsolute(value) && !path.posix.isAbsolute(value)
+      : path.posix.isAbsolute(value);
+
+  if (value.length === 0 || !isAbsolute) {
     throw new Error(ABSOLUTE_PATH_ERROR);
   }
 }
@@ -15,7 +20,7 @@ export function buildOpenPathCommand(
   platform: NodeJS.Platform,
   absolutePath: string
 ): string[] {
-  assertAbsolutePath(absolutePath);
+  assertAbsolutePath(absolutePath, platform);
 
   if (platform === "darwin") {
     return ["open", absolutePath];
@@ -33,7 +38,7 @@ export function buildRevealPathCommand(
   absolutePath: string,
   isDirectory: boolean
 ): string[] {
-  assertAbsolutePath(absolutePath);
+  assertAbsolutePath(absolutePath, platform);
 
   if (platform === "darwin") {
     return ["open", "-R", absolutePath];
@@ -51,7 +56,7 @@ export function buildTrashCommand(
   absolutePath: string,
   isDirectory: boolean
 ): string[] {
-  assertAbsolutePath(absolutePath);
+  assertAbsolutePath(absolutePath, platform);
 
   if (platform === "darwin") {
     return [

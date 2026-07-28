@@ -22,6 +22,25 @@ describe("assertAbsolutePath", () => {
       expect((error as Error).message).not.toContain(sensitiveRelativePath);
     }
   });
+
+  test("rejects absolute paths from a different platform without exposing them", () => {
+    const mismatches: [NodeJS.Platform, string][] = [
+      ["darwin", "C:\\Users\\private\\report.txt"],
+      ["linux", "C:\\Users\\private\\report.txt"],
+      ["win32", "/tmp/private/report.txt"],
+    ];
+
+    for (const [platform, sensitivePath] of mismatches) {
+      try {
+        assertAbsolutePath(sensitivePath, platform);
+        throw new Error("Expected cross-platform path validation to fail.");
+      } catch (error) {
+        expect(error).toBeInstanceOf(Error);
+        expect((error as Error).message).toBe("An absolute path is required.");
+        expect((error as Error).message).not.toContain(sensitivePath);
+      }
+    }
+  });
 });
 
 describe("buildOpenPathCommand", () => {
@@ -38,6 +57,18 @@ describe("buildOpenPathCommand", () => {
       "xdg-open",
       "/tmp/report.txt",
     ]);
+  });
+
+  test("validates paths against the requested platform", () => {
+    expect(() =>
+      buildOpenPathCommand("linux", "C:\\Users\\private\\report.txt")
+    ).toThrow("An absolute path is required.");
+    expect(() =>
+      buildRevealPathCommand("win32", "/tmp/private/report.txt", false)
+    ).toThrow("An absolute path is required.");
+    expect(() =>
+      buildTrashCommand("darwin", "C:\\Users\\private\\report.txt", false)
+    ).toThrow("An absolute path is required.");
   });
 });
 

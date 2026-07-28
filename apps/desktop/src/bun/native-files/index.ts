@@ -106,13 +106,13 @@ export function createNativeFileCapabilities(
     options: NativeFileDialogOptions
   ): Promise<string | null> {
     const paths = await dependencies.openFileDialog(options);
-    const selectedPath = paths.map((path) => path.trim()).find(Boolean);
+    const selectedPath = paths.find((path) => path.trim().length > 0);
 
     if (selectedPath === undefined) {
       return null;
     }
 
-    assertAbsolutePath(selectedPath);
+    assertAbsolutePath(selectedPath, process.platform);
     return selectedPath;
   }
 
@@ -132,7 +132,7 @@ export function createNativeFileCapabilities(
         allowsMultipleSelection: false,
       }),
     async openPath(path) {
-      assertAbsolutePath(path);
+      assertAbsolutePath(path, process.platform);
       _runDetached(
         dependencies,
         buildOpenPathCommand(process.platform, path)
@@ -140,7 +140,7 @@ export function createNativeFileCapabilities(
       await Promise.resolve();
     },
     async revealPath(path) {
-      assertAbsolutePath(path);
+      assertAbsolutePath(path, process.platform);
       const isDirectory =
         process.platform === "darwin" || process.platform === "win32"
           ? false
@@ -151,7 +151,7 @@ export function createNativeFileCapabilities(
       );
     },
     async moveToTrash(path) {
-      assertAbsolutePath(path);
+      assertAbsolutePath(path, process.platform);
 
       let pathStat: NativeFileStat;
       try {
@@ -171,14 +171,22 @@ export function createNativeFileCapabilities(
           stderr: "pipe",
         }
       );
-      const exitCode = await childProcess.exited;
+      let stderrConsumed: Promise<void>;
+      try {
+        stderrConsumed =
+          childProcess.stderr?.text().then(
+            () => undefined,
+            () => undefined
+          ) ?? Promise.resolve();
+      } catch {
+        stderrConsumed = Promise.resolve();
+      }
+      const [exitCode] = await Promise.all([
+        childProcess.exited,
+        stderrConsumed,
+      ]);
 
       if (exitCode !== 0) {
-        try {
-          await childProcess.stderr?.text();
-        } catch {
-          // The operation error stays generic even if stderr cannot be read.
-        }
         throw new Error("Failed to move item to Trash.");
       }
     },

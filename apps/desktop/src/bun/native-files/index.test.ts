@@ -68,12 +68,12 @@ describe("native file pickers", () => {
   test("uses single-selection file and directory picker options", async () => {
     const setup = createDependencies({
       openFileDialog: () =>
-        Promise.resolve(["  ", " /tmp/selected-file.txt ", "/tmp/ignored.txt"]),
+        Promise.resolve(["  ", "/tmp/selected-file.txt ", "/tmp/ignored.txt"]),
     });
     const capabilities = createNativeFileCapabilities(setup.dependencies);
 
-    expect(await capabilities.pickFile()).toBe("/tmp/selected-file.txt");
-    expect(await capabilities.pickDirectory()).toBe("/tmp/selected-file.txt");
+    expect(await capabilities.pickFile()).toBe("/tmp/selected-file.txt ");
+    expect(await capabilities.pickDirectory()).toBe("/tmp/selected-file.txt ");
     expect(setup.dialogs).toEqual([]);
   });
 
@@ -181,6 +181,41 @@ describe("moveToTrash", () => {
     await capabilities.moveToTrash("/tmp/already-gone.txt");
 
     expect(spawnCalls).toBe(0);
+  });
+
+  test("starts consuming stderr before the trash process exits", async () => {
+    let resolveExit: (exitCode: number) => void = () => undefined;
+    const exited = new Promise<number>((resolve) => {
+      resolveExit = resolve;
+    });
+    let stderrStarted = false;
+    const deferredProcess: TestProcess = {
+      exited,
+      stderr: {
+        text: () => {
+          stderrStarted = true;
+          return Promise.resolve("");
+        },
+      },
+      unrefCalls: 0,
+      unref() {
+        this.unrefCalls += 1;
+      },
+    };
+    const setup = createDependencies({
+      spawn: (command, options) => {
+        setup.spawns.push({ command, options, process: deferredProcess });
+        return deferredProcess;
+      },
+    });
+    const capabilities = createNativeFileCapabilities(setup.dependencies);
+
+    const trashPromise = capabilities.moveToTrash("/tmp/report.txt");
+    await Promise.resolve();
+
+    expect(stderrStarted).toBeTrue();
+    resolveExit(0);
+    await trashPromise;
   });
 
   test("awaits trash and reports nonzero exit without exposing stderr or path", async () => {

@@ -5,7 +5,22 @@ import {
   electrobunBunMock,
 } from "../test-electrobun-mock";
 
-await mock.module("electrobun/bun", () => electrobunBunMock);
+let applicationMenuListener:
+  | ((event: { data: { action: string } }) => void)
+  | undefined;
+
+await mock.module("electrobun/bun", () => ({
+  ...electrobunBunMock,
+  ApplicationMenu: {
+    ...electrobunBunMock.ApplicationMenu,
+    on: (
+      _event: string,
+      listener: (event: { data: { action: string } }) => void
+    ) => {
+      applicationMenuListener = listener;
+    },
+  },
+}));
 
 const menuModule = await import("./menu");
 
@@ -76,4 +91,18 @@ test("adds Toggle Sidebar first in the View menu", () => {
     },
     { type: "divider" },
   ]);
+});
+
+test("dispatches the Toggle Sidebar menu action", () => {
+  const fakeWindow = {} as never;
+  const executeCommand = mock(() => undefined);
+  menuModule.registerMenuActions(fakeWindow, executeCommand);
+
+  expect(applicationMenuListener).toBeFunction();
+  applicationMenuListener?.({ data: { action: "toggleSidebar" } });
+
+  expect(executeCommand).toHaveBeenCalledWith(
+    { type: "toggleSidebar", args: {} },
+    fakeWindow
+  );
 });

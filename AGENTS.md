@@ -18,20 +18,22 @@ package manager and JavaScript runtime. Its compatible version is declared in
 
 Do not use npm, pnpm, or Yarn.
 
-| Task                 | Command                   | Notes                                                 |
-| -------------------- | ------------------------- | ----------------------------------------------------- |
-| Set up a fresh clone | `mise run setup`          | Installs the locked tools and JavaScript dependencies |
-| Install dependencies | `bun install`             | Run from the repository root                          |
-| Run the desktop app  | `mise run dev`            | Vite HMR on port 5173 plus Electrobun                 |
-| Test                 | `mise run test`           | Runs the complete Bun test suite                      |
-| Lint                 | `mise run lint`           | Read-only ESLint check                                |
-| Fix lint             | `mise run lint:fix`       | Runs ESLint with autofix                              |
-| Typecheck            | `mise run typecheck`      | Checks the root, shared UI, and desktop projects      |
-| Build canary         | `mise run build:canary`   | Builds the renderer and Electrobun canary package     |
-| Build stable         | `mise run build:stable`   | Builds the renderer and Electrobun stable package     |
-| Package locally      | `mise run pack`           | Unsigned canary packaging check                       |
-| Cut a release        | `mise run release`        | Bumps, tags, and pushes a stable release              |
-| Cut a canary         | `mise run release:canary` | Bumps, tags, and pushes a prerelease                  |
+| Task                 | Command                       | Notes                                                 |
+| -------------------- | ----------------------------- | ----------------------------------------------------- |
+| Set up a fresh clone | `mise run setup`              | Installs the locked tools and JavaScript dependencies |
+| Install dependencies | `bun install`                 | Run from the repository root                          |
+| Run the desktop app  | `mise run dev`                | Vite HMR on port 5173 plus Electrobun                 |
+| Diagnose with CEF    | `mise run dev:cef`            | Local CEF + loopback CDP; never used for releases     |
+| Test                 | `mise run test`               | Runs the complete Bun test suite                      |
+| Check feature docs   | `mise run check:feature-docs` | Verifies bilingual catalog IDs, order, and fields     |
+| Lint                 | `mise run lint`               | Read-only ESLint check                                |
+| Fix lint             | `mise run lint:fix`           | Runs ESLint with autofix                              |
+| Typecheck            | `mise run typecheck`          | Checks the root, shared UI, and desktop projects      |
+| Build canary         | `mise run build:canary`       | Builds the renderer and Electrobun canary package     |
+| Build stable         | `mise run build:stable`       | Builds the renderer and Electrobun stable package     |
+| Package locally      | `mise run pack`               | Unsigned canary packaging check                       |
+| Cut a release        | `mise run release`            | Bumps, tags, and pushes a stable release              |
+| Cut a canary         | `mise run release:canary`     | Bumps, tags, and pushes a prerelease                  |
 
 Changes to the renderer update through HMR. Restart `mise run dev` after changing
 Bun main-process code.
@@ -75,6 +77,13 @@ The production composition root is
 `apps/desktop/src/bun/app/start-desktop-app.ts`. Construct process-scoped
 services there and pass dependencies explicitly into RPC, commands, and
 lifecycle code. Avoid import-time manager instances and service locators.
+
+Modules that require a downstream product decision stay disconnected by
+default. In particular, native files, desktop-safe links, and deep links must
+not gain import-time registration, RPC handlers, commands, menus, renderer
+consumers, schemes, or packaging changes merely because their reusable source
+exists. Connect them only with an explicit use case and the required validation,
+authorization, and confirmation policy.
 
 ## Persistence
 
@@ -123,6 +132,12 @@ Public assets referenced by absolute paths belong under
 directories explicitly copied by `apps/desktop/electrobun.config.ts`, so update
 its `build.copy` map when adding a new top-level public directory.
 
+`packages/ui/src/lib/local-storage.ts` owns the registry of browser persistence
+keys. The synchronous pre-React appearance bootstrap in
+`apps/desktop/src/mainview/index.html` cannot import that registry; when theme or
+primary-color keys change, update its explicitly documented mirror literals in
+the same change.
+
 The application icon lives in `apps/desktop/icon.iconset`.
 
 ## Conventions
@@ -145,6 +160,9 @@ The application icon lives in `apps/desktop/icon.iconset`.
 - Route destructive or irreversible actions through a confirmation dialog.
 - Menu and command labels use Title Case. Ordinary buttons, headings, helper
   text, and dialogs use sentence case.
+- Keep `docs/FEATURES.md` and `docs/FEATURES_EN.md` structurally synchronized:
+  preserve the same `<!-- feature: id -->` markers and order, and update all five
+  localized fields in both files. Run `mise run check:feature-docs` after edits.
 
 Prettier uses two-space indentation, double quotes, semicolons, ES5 trailing
 commas, and Tailwind class sorting. Import ordering is enforced by ESLint.
@@ -161,6 +179,7 @@ Before claiming a change is complete, run checks appropriate to its scope. The
 full local gate is:
 
 ```bash
+mise run check:feature-docs
 mise run typecheck
 mise run lint
 mise run test

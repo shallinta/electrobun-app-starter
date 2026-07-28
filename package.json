@@ -16,6 +16,7 @@
     "test": "bun test",
     "lint": "eslint --max-warnings 0 .",
     "lint:fix": "eslint --fix .",
+    "check:feature-docs": "bun scripts/check-feature-docs.ts",
     "check:lockfile": "bun scripts/check-lockfile-registry.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p packages/ui/tsconfig.json && tsc --noEmit -p apps/desktop/tsconfig.json",
     "prepare": "husky"

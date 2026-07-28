@@ -17,11 +17,19 @@
 
 - Electrobun Bun 主进程和由 Vite 驱动的 React 渲染进程。
 - 两个运行时上下文之间的类型安全 RPC 边界和命令路由。
-- 原生窗口与菜单管理、窗口状态持久化，以及安全的外部链接处理。
+- 原生窗口与菜单管理、窗口状态持久化、可折叠侧栏，以及安全的外部链接处理。
+- 全屏状态 RPC、渲染端订阅基础和最大化命令；自定义标题栏 UI 由下游应用按需挂载。
 - 主题、主色、软件更新和关于设置。
 - 自动更新基础设施，以及面向 Apple Silicon 和 Intel 的 macOS 发布工作流。
+- 可选的本地 CEF/CDP 诊断命令；默认开发和所有发行构建仍使用系统 WebView。
 - 基于 Tailwind CSS 和 shadcn/ui primitives 的共享 UI 包。
 - Bun 测试、TypeScript 检查、ESLint、Prettier、Husky 和 GitHub Actions。
+
+<!-- i18n: feature-catalog -->
+
+## 功能清单
+
+[中文功能清单](./docs/FEATURES.md)区分默认应用外壳已经连接的能力与需要下游产品主动接入的可选模块，并在清单顶部提供英文切换。源码存在不等于该能力已经默认启用、打包、注册或发布；例如原生文件操作和 deep link 模板默认保持断开。
 
 <!-- i18n: requirements -->
 
@@ -53,17 +61,19 @@ React 渲染进程的改动会通过 HMR 更新。修改 Bun 主进程代码后�
 
 ## 常用命令
 
-| 任务               | 命令                    |
-| ------------------ | ----------------------- |
-| 查看全部任务       | `mise tasks ls`         |
-| 安装依赖           | `bun install`           |
-| 启动桌面应用       | `mise run dev`          |
-| 运行测试           | `mise run test`         |
-| 运行 lint          | `mise run lint`         |
-| 运行类型检查       | `mise run typecheck`    |
-| 构建 canary 安装包 | `mise run build:canary` |
-| 构建 stable 安装包 | `mise run build:stable` |
-| 执行无签名打包检查 | `mise run pack`         |
+| 任务               | 命令                          |
+| ------------------ | ----------------------------- |
+| 查看全部任务       | `mise tasks ls`               |
+| 安装依赖           | `bun install`                 |
+| 启动桌面应用       | `mise run dev`                |
+| 使用 CEF/CDP 诊断  | `mise run dev:cef`            |
+| 运行测试           | `mise run test`               |
+| 检查双语功能清单   | `mise run check:feature-docs` |
+| 运行 lint          | `mise run lint`               |
+| 运行类型检查       | `mise run typecheck`          |
+| 构建 canary 安装包 | `mise run build:canary`       |
+| 构建 stable 安装包 | `mise run build:stable`       |
+| 执行无签名打包检查 | `mise run pack`               |
 
 本仓库统一使用 Bun 管理依赖和运行脚本，不要使用 npm、pnpm 或 Yarn。
 
@@ -136,7 +146,9 @@ RPC 和命令边界扩展原生能力。
       `apps/desktop/scripts/serve-feed.ts`、
       `packages/shared/src/server/paths.ts`、`mise.toml` 和相关测试中的所有引用。除非
       Electrobun 接口本身发生变化，否则不要修改 Electrobun 自有的
-      `ELECTROBUN_DEVELOPER_ID` 或 `ELECTROBUN_APPLEAPI*` 变量。
+      `ELECTROBUN_DEVELOPER_ID` 或 `ELECTROBUN_APPLEAPI*` 变量。这个应用前缀也覆盖仅用于开发和构建选择的
+      `ELECTROBUN_APP_STARTER_DESKTOP_RENDERER` 与
+      `ELECTROBUN_APP_STARTER_CDP_PORT`。
 - [ ] 为新产品隔离浏览器持久化数据。在
       `packages/ui/src/components/theme-provider.tsx` 和
       `apps/desktop/src/mainview/index.html` 的 React 启动前脚本中，同时替换

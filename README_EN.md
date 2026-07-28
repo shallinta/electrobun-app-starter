@@ -19,13 +19,28 @@ embedded Chromium edition.
 
 - An Electrobun main process and a Vite-powered React renderer.
 - A typed RPC boundary and command routing between the two runtime contexts.
-- Native window and menu management, persisted window state, and safe external
-  link handling.
+- Native window and menu management, persisted window state, a collapsible
+  sidebar, and safe external link handling.
+- Full-screen state RPC, renderer subscription infrastructure, and a maximize
+  command; downstream apps mount custom title-bar UI only when needed.
 - Theme, primary-color, update, and about settings.
 - Automatic-update infrastructure and macOS release workflows for Apple
   Silicon and Intel.
+- An opt-in local CEF/CDP diagnostic command; normal development and every
+  release build continue to use the system WebView.
 - A shared UI package with Tailwind CSS and shadcn/ui primitives.
 - Bun tests, TypeScript checks, ESLint, Prettier, Husky, and GitHub Actions.
+
+<!-- i18n: feature-catalog -->
+
+## Feature catalog
+
+The [English feature catalog](./docs/FEATURES_EN.md) separates capabilities
+connected to the default app shell from optional modules that a downstream
+product must deliberately connect, and its header links to Chinese. Source code
+existing does not mean a capability is enabled, packaged, registered, or
+released by default; native file operations and the deep-link template, for
+example, remain disconnected.
 
 <!-- i18n: requirements -->
 
@@ -58,17 +73,19 @@ changing Bun main-process code.
 
 ## Common commands
 
-| Task                            | Command                 |
-| ------------------------------- | ----------------------- |
-| List available tasks            | `mise tasks ls`         |
-| Install dependencies            | `bun install`           |
-| Run the desktop app             | `mise run dev`          |
-| Run tests                       | `mise run test`         |
-| Run lint                        | `mise run lint`         |
-| Run type checks                 | `mise run typecheck`    |
-| Build a canary package          | `mise run build:canary` |
-| Build a stable package          | `mise run build:stable` |
-| Run an unsigned packaging check | `mise run pack`         |
+| Task                             | Command                       |
+| -------------------------------- | ----------------------------- |
+| List available tasks             | `mise tasks ls`               |
+| Install dependencies             | `bun install`                 |
+| Run the desktop app              | `mise run dev`                |
+| Diagnose with CEF/CDP            | `mise run dev:cef`            |
+| Run tests                        | `mise run test`               |
+| Check bilingual feature catalogs | `mise run check:feature-docs` |
+| Run lint                         | `mise run lint`               |
+| Run type checks                  | `mise run typecheck`          |
+| Build a canary package           | `mise run build:canary`       |
+| Build a stable package           | `mise run build:stable`       |
+| Run an unsigned packaging check  | `mise run pack`               |
 
 Use Bun for packages and scripts. Do not use npm, pnpm, or Yarn in this
 repository.
@@ -148,7 +165,10 @@ your product.
       `apps/desktop/scripts/serve-feed.ts`, `packages/shared/src/server/paths.ts`,
       `mise.toml`, and tests. Do not rename Electrobun's own
       `ELECTROBUN_DEVELOPER_ID` or `ELECTROBUN_APPLEAPI*` variables unless the
-      Electrobun interface itself changes.
+      Electrobun interface itself changes. This application prefix also covers
+      the development/build selectors
+      `ELECTROBUN_APP_STARTER_DESKTOP_RENDERER` and
+      `ELECTROBUN_APP_STARTER_CDP_PORT`.
 - [ ] Namespace browser persistence for the new product. Replace
       `electrobun-app-starter-theme` and
       `electrobun-app-starter-primary` together in

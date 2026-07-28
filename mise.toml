@@ -42,6 +42,10 @@ run = "bun run dev:cef"
 description = "Run all Bun tests"
 run = "bun run test"
 
+[tasks."check:feature-docs"]
+description = "Verify the Chinese and English feature catalogs stay synchronized"
+run = "bun run check:feature-docs"
+
 [tasks."check:lockfile"]
 description = "Reject lockfiles that reference unsupported package mirrors"
 run = "bun run check:lockfile"

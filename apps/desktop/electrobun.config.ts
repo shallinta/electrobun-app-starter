@@ -58,6 +58,9 @@ export default {
     // electrobun#485 (x64-only, no-op elsewhere); see the script header.
     postBuild: "scripts/fix-x64-headerpad.ts",
     postWrap: "scripts/fix-x64-headerpad.ts",
+    // Electrobun appends "-dev" to CFBundleName; keep the development display
+    // name aligned with app.name without changing the generated bundle path.
+    postPackage: "scripts/fix-dev-display-name.ts",
   },
   release: {
     // Burned into every shipped bundle — the updater fetches

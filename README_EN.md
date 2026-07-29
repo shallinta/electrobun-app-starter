@@ -23,7 +23,8 @@ embedded Chromium edition.
   sidebar, and safe external link handling.
 - Full-screen state RPC, renderer subscription infrastructure, and a maximize
   command; downstream apps mount custom title-bar UI only when needed.
-- Theme, primary-color, update, and about settings.
+- An internationalized shell with live `en-US`/`zh-CN` switching and Bun-owned
+  locale persistence, plus theme, primary-color, update, and about settings.
 - Automatic-update infrastructure and macOS release workflows for Apple
   Silicon and Intel.
 - An opt-in local CEF/CDP diagnostic command; normal development and every
@@ -110,6 +111,40 @@ capabilities through the typed RPC contract in
 Cross-boundary user actions use the command definitions in
 `apps/desktop/src/shared/commands.ts`.
 
+<!-- i18n: localization -->
+
+## Bilingual localization
+
+The app shell supports only `en-US` and `zh-CN`. The Bun process is the single
+source of truth for locale. On first launch, every Chinese system-locale variant
+maps to `zh-CN` and every other locale maps to `en-US`; the selection is written
+to `settings/locale.json` below the application data directory (by default,
+`~/.electrobun-app-starter/settings/locale.json`) and takes precedence on later
+launches.
+
+The renderer reads its initial value through the typed `getLocale` RPC, submits
+preference changes through `setLocale`, and subscribes to `localeChanged`. After
+a successful switch, the React shell, command palette, and update copy refresh,
+the document root's `lang`/`dir` attributes are synchronized, and the Bun
+process rebuilds the native menus with the same locale. No application restart
+is required. If renderer localization initialization fails, the startup error
+screen displays English and Chinese together so the failure and retry action
+remain understandable.
+
+Translation resources live under
+`apps/desktop/src/shared/i18n/resources/{en-US,zh-CN}/` and are split into the
+`common`, `settings`, `menu`, `commands`, and `updates` JSON namespaces. When
+adding or changing user-visible copy:
+
+1. Add the same key to the same namespace in both locale directories.
+2. Use `useTranslation` in React components and the translation function from
+   `apps/desktop/src/bun/i18n` for Bun-native menus or dialogs.
+3. Do not translate command discriminants, RPC names, log fields, or persisted
+   enum values.
+4. Run `mise run typecheck` for strict key typing and
+   `bun test apps/desktop/src/shared/i18n/index.test.ts` for namespace, key, and
+   supported-locale parity.
+
 <!-- i18n: customize -->
 
 ## Customize the starter
@@ -136,10 +171,11 @@ your product.
 - [ ] Change the application name in
       `apps/desktop/electrobun.config.ts` (`app.name`, currently
       `Electrobun App Starter`) and all user-visible copies in
-      `apps/desktop/src/mainview/index.html`, `apps/desktop/src/app/page.tsx`,
-      `apps/desktop/src/components/settings/settings-dialog.tsx`,
-      `apps/desktop/src/bun/app/window.ts`, and
-      `apps/desktop/src/bun/app/menu.ts`.
+      `apps/desktop/src/mainview/index.html`,
+      `apps/desktop/src/bun/app/window.ts`, and both locale directories under
+      `apps/desktop/src/shared/i18n/resources/`. Synchronize every new or changed
+      user-visible brand string across the `en-US` and `zh-CN` catalogs, then
+      pass strict key typechecking and the locale parity tests.
 - [ ] Assign a bundle identifier owned by your organization in
       `apps/desktop/electrobun.config.ts` (`app.identifier`, currently
       `com.shallinta.electrobun-app-starter`). Treat it as permanent after release

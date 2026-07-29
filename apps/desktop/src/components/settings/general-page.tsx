@@ -15,9 +15,12 @@ import {
   SelectValue,
 } from "@shallinta/ui/ui/select";
 import type { ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 
 import { useCommands } from "@/commands";
+import { useLocale } from "@/hooks/use-locale";
 import { useUpdateMode } from "@/hooks/use-update-mode";
+import type { SupportedLocale } from "@/shared/i18n";
 import type { UpdateMode } from "@/shared/updates";
 
 import { PrimaryColorPicker } from "./primary-color-picker";
@@ -69,8 +72,11 @@ function RowLabel({ title, hint }: { title: string; hint?: string }) {
 }
 
 export function GeneralPage() {
+  const { t } = useTranslation("settings");
+  const { t: tCommon } = useTranslation("common");
   const { theme, setTheme } = useTheme();
   const { executeCommand } = useCommands();
+  const { locale, isSaving: isLocaleSaving, change: setLocale } = useLocale();
   const {
     mode: updateMode,
     isSaving: isUpdateModeSaving,
@@ -84,53 +90,60 @@ export function GeneralPage() {
   } = usePrimaryColor();
 
   return (
-    <SettingsPage title="General" className="overflow-y-auto">
+    <SettingsPage title={t("general")} className="overflow-y-auto">
       <div className="flex flex-col gap-7 pb-2">
-        <SettingsSection title="Appearance">
+        <SettingsSection title={t("appearance")}>
           <SettingsRow
             label={
-              <RowLabel
-                title="Language"
-                hint="English only for now — more languages can be added later."
-              />
+              <RowLabel title={t("language.title")} hint={t("language.hint")} />
             }
           >
-            <Select defaultValue="en-US" disabled>
-              <SelectTrigger className="w-32" aria-label="Language">
+            <Select
+              value={locale}
+              disabled={isLocaleSaving}
+              onValueChange={(value) =>
+                void setLocale(value as SupportedLocale)
+              }
+            >
+              <SelectTrigger className="w-32" aria-label={t("language.title")}>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="en-US">English (US)</SelectItem>
+                <SelectItem value="en-US">
+                  {t("language.options.en-US")}
+                </SelectItem>
+                <SelectItem value="zh-CN">
+                  {t("language.options.zh-CN")}
+                </SelectItem>
               </SelectContent>
             </Select>
           </SettingsRow>
           <SettingsRow
-            label={
-              <RowLabel
-                title="Theme"
-                hint="Match your system setting, or force light or dark."
-              />
-            }
+            label={<RowLabel title={t("theme.title")} hint={t("theme.hint")} />}
           >
             <Select
               value={theme}
               onValueChange={(value) => setTheme(value as Theme)}
             >
-              <SelectTrigger className="w-32" aria-label="Theme">
+              <SelectTrigger className="w-32" aria-label={t("theme.title")}>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="light">Light</SelectItem>
-                <SelectItem value="dark">Dark</SelectItem>
-                <SelectItem value="system">System</SelectItem>
+                <SelectItem value="light">
+                  {t("theme.options.light")}
+                </SelectItem>
+                <SelectItem value="dark">{t("theme.options.dark")}</SelectItem>
+                <SelectItem value="system">
+                  {t("theme.options.system")}
+                </SelectItem>
               </SelectContent>
             </Select>
           </SettingsRow>
           <SettingsRow
             label={
               <RowLabel
-                title="Primary color"
-                hint="The accent color for buttons, links, and highlights."
+                title={t("primaryColor.title")}
+                hint={t("primaryColor.hint")}
               />
             }
           >
@@ -141,7 +154,7 @@ export function GeneralPage() {
                   variant="secondary"
                   onClick={resetPrimaryColor}
                 >
-                  Reset
+                  {tCommon("actions.reset")}
                 </Button>
               ) : null}
               <PrimaryColorPicker
@@ -152,13 +165,10 @@ export function GeneralPage() {
             </div>
           </SettingsRow>
         </SettingsSection>
-        <SettingsSection title="Updates">
+        <SettingsSection title={t("updates.section")}>
           <SettingsRow
             label={
-              <RowLabel
-                title="Software updates"
-                hint="Automatic downloads updates in the background and prompts you to restart."
-              />
+              <RowLabel title={t("updates.title")} hint={t("updates.hint")} />
             }
           >
             <div className="flex items-center gap-2">
@@ -169,13 +179,22 @@ export function GeneralPage() {
                   void setUpdateMode(value as UpdateMode)
                 }
               >
-                <SelectTrigger className="w-40" aria-label="Software updates">
+                <SelectTrigger
+                  className="w-40"
+                  aria-label={t("updates.ariaLabel")}
+                >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="automatic">Automatic</SelectItem>
-                  <SelectItem value="manual">Check manually</SelectItem>
-                  <SelectItem value="off">Off</SelectItem>
+                  <SelectItem value="automatic">
+                    {t("updates.options.automatic")}
+                  </SelectItem>
+                  <SelectItem value="manual">
+                    {t("updates.options.manual")}
+                  </SelectItem>
+                  <SelectItem value="off">
+                    {t("updates.options.off")}
+                  </SelectItem>
                 </SelectContent>
               </Select>
               <Button
@@ -185,7 +204,7 @@ export function GeneralPage() {
                   executeCommand({ type: "checkForUpdates", args: {} })
                 }
               >
-                Check now
+                {t("updates.checkNow")}
               </Button>
             </div>
           </SettingsRow>

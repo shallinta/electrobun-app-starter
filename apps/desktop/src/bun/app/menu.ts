@@ -5,7 +5,9 @@ import {
 } from "electrobun/bun";
 
 import type { Command } from "../../shared/commands";
+import type { SupportedLocale } from "../../shared/i18n";
 import type { UpdateMode } from "../../shared/updates";
+import { activateBunLocale, translate as t } from "../i18n";
 
 const DOCS_URL = "https://github.com/shallinta/electrobun-app-starter#readme";
 const HOMEPAGE_URL = "https://github.com/shallinta/electrobun-app-starter";
@@ -19,29 +21,40 @@ function appSubmenu(
   updateMode: UpdateMode
 ): ApplicationMenuItemConfig {
   const updateItem = updateReady
-    ? { label: "Restart to Update", action: "restartToUpdate" }
+    ? {
+        label: t("menu:app.restartToUpdate"),
+        action: "restartToUpdate",
+      }
     : {
-        label: "Check for Updates...",
+        label: t("menu:app.checkForUpdates"),
         action: "checkForUpdates",
         enabled: updateMode !== "off",
       };
   return {
     submenu: [
-      { label: "About Electrobun App Starter", role: "about" },
+      { label: t("menu:app.about"), role: "about" },
       updateItem,
       { type: "divider" },
       {
-        label: "Settings...",
+        label: t("menu:app.settings"),
         action: "settings",
         accelerator: "CommandOrControl+,",
       },
       { type: "divider" },
-      { role: "hide", accelerator: "CommandOrControl+H" },
-      { role: "hideOthers", accelerator: "CommandOrControl+Shift+H" },
-      { role: "showAll" },
+      {
+        label: t("menu:app.hide"),
+        role: "hide",
+        accelerator: "CommandOrControl+H",
+      },
+      {
+        label: t("menu:app.hideOthers"),
+        role: "hideOthers",
+        accelerator: "CommandOrControl+Shift+H",
+      },
+      { label: t("menu:app.showAll"), role: "showAll" },
       { type: "divider" },
       {
-        label: "Quit Electrobun App Starter",
+        label: t("menu:app.quit"),
         role: "quit",
         accelerator: "CommandOrControl+Q",
       },
@@ -56,83 +69,103 @@ function buildMenu(
   return [
     appSubmenu(updateReady, updateMode),
     {
-      label: "File",
+      label: t("menu:file.title"),
       submenu: [
-        { label: "New...", enabled: false },
-        { label: "Open...", enabled: false },
+        { label: t("menu:file.new"), enabled: false },
+        { label: t("menu:file.open"), enabled: false },
       ],
     },
     {
-      label: "Edit",
+      label: t("menu:edit.title"),
       submenu: [
-        { role: "undo" },
-        { role: "redo" },
+        { label: t("menu:edit.undo"), role: "undo" },
+        { label: t("menu:edit.redo"), role: "redo" },
         { type: "divider" },
-        { role: "cut" },
-        { role: "copy" },
-        { role: "paste" },
-        { role: "pasteAndMatchStyle" },
-        { role: "delete" },
-        { role: "selectAll" },
+        { label: t("menu:edit.cut"), role: "cut" },
+        { label: t("menu:edit.copy"), role: "copy" },
+        { label: t("menu:edit.paste"), role: "paste" },
+        {
+          label: t("menu:edit.pasteAndMatchStyle"),
+          role: "pasteAndMatchStyle",
+        },
+        { label: t("menu:edit.delete"), role: "delete" },
+        { label: t("menu:edit.selectAll"), role: "selectAll" },
       ],
     },
     {
-      label: "View",
+      label: t("menu:view.title"),
       submenu: [
         {
-          label: "Toggle Sidebar",
+          label: t("menu:view.toggleSidebar"),
           action: "toggleSidebar",
           accelerator: "CommandOrControl+B",
         },
         { type: "divider" },
         {
-          label: "Command Palette...",
+          label: t("menu:view.commandPalette"),
           action: "commandPalette",
           accelerator: "CommandOrControl+Shift+P",
         },
         { type: "divider" },
         {
-          label: "Reload",
+          label: t("menu:view.reload"),
           action: "reload",
           accelerator: "CommandOrControl+Shift+R",
         },
         { type: "divider" },
         {
-          label: "Zoom In",
+          label: t("menu:view.zoomIn"),
           action: "zoomIn",
           accelerator: "CommandOrControl+Plus",
         },
         {
-          label: "Zoom Out",
+          label: t("menu:view.zoomOut"),
           action: "zoomOut",
           accelerator: "CommandOrControl+-",
         },
         {
-          label: "Reset Zoom",
+          label: t("menu:view.resetZoom"),
           action: "resetZoom",
           accelerator: "CommandOrControl+0",
         },
       ],
     },
     {
-      label: "Window",
+      label: t("menu:window.title"),
       role: "window",
       submenu: [
-        { role: "minimize" },
-        { role: "bringAllToFront" },
+        { label: t("menu:window.minimize"), role: "minimize" },
+        {
+          label: t("menu:window.bringAllToFront"),
+          role: "bringAllToFront",
+        },
         { type: "divider" },
-        { role: "toggleFullScreen", accelerator: "CommandOrControl+Shift+F" },
+        {
+          label: t("menu:window.toggleFullScreen"),
+          role: "toggleFullScreen",
+          accelerator: "CommandOrControl+Shift+F",
+        },
       ],
     },
     {
-      label: "Help",
+      label: t("menu:help.title"),
       submenu: [
-        { label: "View Documentation", action: "openDocumentation" },
-        { label: "Visit Official Website", action: "openHomepage" },
-        { label: "Visit GitHub Project", action: "openRepository" },
+        {
+          label: t("menu:help.documentation"),
+          action: "openDocumentation",
+        },
+        { label: t("menu:help.homepage"), action: "openHomepage" },
+        { label: t("menu:help.repository"), action: "openRepository" },
       ],
     },
   ];
+}
+
+export async function setLocaleInMenu(locale: SupportedLocale): Promise<void> {
+  await activateBunLocale(locale);
+  ApplicationMenu.setApplicationMenu(
+    buildMenu(currentUpdateReady, currentUpdateMode)
+  );
 }
 
 export function setUpdateReadyInMenu(version: string | null) {

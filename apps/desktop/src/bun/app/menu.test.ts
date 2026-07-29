@@ -6,8 +6,7 @@ import {
 } from "../test-electrobun-mock";
 
 let applicationMenuListener:
-  | ((event: { data: { action: string } }) => void)
-  | undefined;
+  ((event: { data: { action: string } }) => void) | undefined;
 
 await mock.module("electrobun/bun", () => ({
   ...electrobunBunMock,
@@ -105,4 +104,48 @@ test("dispatches the Toggle Sidebar menu action", () => {
     { type: "toggleSidebar", args: {} },
     fakeWindow
   );
+});
+
+test("rebuilds every native menu role and custom action in Chinese", async () => {
+  menuModule.registerMenuActions({} as never, () => undefined);
+  await (
+    menuModule as typeof menuModule & {
+      setLocaleInMenu?: (locale: "zh-CN") => Promise<void>;
+    }
+  ).setLocaleInMenu?.("zh-CN");
+
+  const latestMenu = menus[menus.length - 1] as {
+    label?: string;
+    submenu?: {
+      label?: string;
+      role?: string;
+      action?: string;
+    }[];
+  }[];
+
+  expect(latestMenu.slice(1).map(({ label }) => label)).toEqual([
+    "文件",
+    "编辑",
+    "视图",
+    "窗口",
+    "帮助",
+  ]);
+  expect(
+    latestMenu[0]?.submenu?.find(({ role }) => role === "quit")?.label
+  ).toBe("退出 Electrobun App Starter");
+  expect(
+    latestMenu
+      .find(({ label }) => label === "编辑")
+      ?.submenu?.find(({ role }) => role === "undo")?.label
+  ).toBe("撤销");
+  expect(
+    latestMenu
+      .find(({ label }) => label === "窗口")
+      ?.submenu?.find(({ role }) => role === "toggleFullScreen")?.label
+  ).toBe("切换全屏");
+  expect(
+    latestMenu
+      .find(({ label }) => label === "帮助")
+      ?.submenu?.find(({ action }) => action === "openDocumentation")?.label
+  ).toBe("查看文档");
 });

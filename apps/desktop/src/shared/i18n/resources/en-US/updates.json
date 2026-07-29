@@ -1,0 +1,49 @@
+{
+  "dialog": {
+    "checking": {
+      "title": "Checking for updates",
+      "description": "Contacting the update server…"
+    },
+    "downloading": {
+      "title": "Downloading update",
+      "description": "Getting version {{version}} ready to install…",
+      "background": "Continue in background"
+    },
+    "upToDate": {
+      "title": "You're all set!",
+      "description": "You're already running the latest version — v{{version}}.",
+      "confirm": "Gotcha"
+    },
+    "ready": {
+      "title": "Update ready",
+      "description": "Version {{version}} has been downloaded and is ready to install. Restarting takes just a moment.",
+      "restartNow": "Restart now"
+    },
+    "error": {
+      "title": "Update check failed",
+      "description": "Try again, and check the application logs for details."
+    }
+  },
+  "indicator": {
+    "tooltip": "Update ready — restart to install",
+    "ariaLabel": "Update ready",
+    "title": "Update ready",
+    "description": "v{{version}} has been downloaded. Restart to install.",
+    "restartNow": "Restart now"
+  },
+  "cards": {
+    "readyTitle": "Update ready",
+    "readyDescription": "v{{version}} is ready to install.",
+    "restart": "Restart",
+    "downloadingTitle": "Downloading update",
+    "downloadingDescription": "v{{version}} — this continues in the background."
+  },
+  "toast": {
+    "updated": "Updated to v{{version}}",
+    "releaseNotes": "Release notes"
+  },
+  "errors": {
+    "saveSettings": "Couldn’t save software update settings.",
+    "loadSettings": "Couldn’t load software update settings."
+  }
+}

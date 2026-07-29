@@ -46,19 +46,17 @@ export type CommandArgs<T extends CommandType> = Extract<
   { type: T }
 >["args"];
 
-export const COMMAND_META: Record<
-  CommandType,
-  { label: string; target: "webview" | "bun" }
-> = {
-  openSettings: { label: "Settings", target: "webview" },
-  openCommandPalette: { label: "Command Palette", target: "webview" },
-  toggleSidebar: { label: "Toggle Sidebar", target: "webview" },
-  zoomIn: { label: "Zoom In", target: "bun" },
-  zoomOut: { label: "Zoom Out", target: "bun" },
-  resetZoom: { label: "Reset Zoom", target: "bun" },
-  reload: { label: "Reload", target: "bun" },
-  toggleMaximized: { label: "Toggle Maximize", target: "bun" },
-  openLink: { label: "Open Link", target: "bun" },
-  checkForUpdates: { label: "Check for Updates...", target: "bun" },
-  applyUpdateAndRestart: { label: "Restart to Update", target: "bun" },
-};
+export const COMMAND_META: Record<CommandType, { target: "webview" | "bun" }> =
+  {
+    openSettings: { target: "webview" },
+    openCommandPalette: { target: "webview" },
+    toggleSidebar: { target: "webview" },
+    zoomIn: { target: "bun" },
+    zoomOut: { target: "bun" },
+    resetZoom: { target: "bun" },
+    reload: { target: "bun" },
+    toggleMaximized: { target: "bun" },
+    openLink: { target: "bun" },
+    checkForUpdates: { target: "bun" },
+    applyUpdateAndRestart: { target: "bun" },
+  };

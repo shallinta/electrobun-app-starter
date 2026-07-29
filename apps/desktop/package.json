@@ -18,9 +18,11 @@
     "@shallinta/shared": "workspace:*",
     "@shallinta/ui": "workspace:*",
     "electrobun": "^1.18.1",
+    "i18next": "^26.3.6",
     "lucide-react": "^1.22.0",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "react-i18next": "^17.0.11",
     "react-resizable-panels": "^4.12.0",
     "sonner": "^2.0.7"
   },

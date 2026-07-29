@@ -1,0 +1,49 @@
+{
+  "app": {
+    "about": "About Electrobun App Starter",
+    "checkForUpdates": "Check for Updates...",
+    "restartToUpdate": "Restart to Update",
+    "settings": "Settings...",
+    "hide": "Hide Electrobun App Starter",
+    "hideOthers": "Hide Others",
+    "showAll": "Show All",
+    "quit": "Quit Electrobun App Starter"
+  },
+  "file": {
+    "title": "File",
+    "new": "New...",
+    "open": "Open..."
+  },
+  "edit": {
+    "title": "Edit",
+    "undo": "Undo",
+    "redo": "Redo",
+    "cut": "Cut",
+    "copy": "Copy",
+    "paste": "Paste",
+    "pasteAndMatchStyle": "Paste and Match Style",
+    "delete": "Delete",
+    "selectAll": "Select All"
+  },
+  "view": {
+    "title": "View",
+    "toggleSidebar": "Toggle Sidebar",
+    "commandPalette": "Command Palette...",
+    "reload": "Reload",
+    "zoomIn": "Zoom In",
+    "zoomOut": "Zoom Out",
+    "resetZoom": "Reset Zoom"
+  },
+  "window": {
+    "title": "Window",
+    "minimize": "Minimize",
+    "bringAllToFront": "Bring All to Front",
+    "toggleFullScreen": "Toggle Full Screen"
+  },
+  "help": {
+    "title": "Help",
+    "documentation": "View Documentation",
+    "homepage": "Visit Official Website",
+    "repository": "Visit GitHub Project"
+  }
+}

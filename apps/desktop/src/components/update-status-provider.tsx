@@ -11,11 +11,13 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { useCommands } from "@/commands";
 import { UpdateDialog } from "@/components/update-dialog";
 import { electrobun } from "@/lib/electrobun";
+import { getStableRendererI18n } from "@/lib/renderer-i18n";
 import type {
   UpdateStatus,
   UpdateStatusChangedPayload,
@@ -53,24 +55,27 @@ function _UpdateReadyCard({
   onRestart: () => void;
   onDismiss: () => void;
 }) {
+  const { t } = useTranslation(["updates", "common"]);
   return (
     <div className="flex w-[356px] max-w-[calc(100vw-2rem)] items-center gap-3 rounded-2xl border border-white/15 bg-black/45 p-3.5 text-white shadow-2xl backdrop-blur-md">
       <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-emerald-400/18 text-emerald-200">
         <CheckIcon className="size-4" />
       </div>
       <div className="min-w-0 grow">
-        <div className="text-sm font-medium">Update ready</div>
+        <div className="text-sm font-medium">
+          {t("updates:cards.readyTitle")}
+        </div>
         <div className="truncate text-xs text-white/65">
-          v{version} is ready to install.
+          {t("updates:cards.readyDescription", { version })}
         </div>
       </div>
       <div className="flex shrink-0 items-center gap-1">
         <Button size="sm" onClick={onRestart}>
-          Restart
+          {t("updates:cards.restart")}
         </Button>
         <button
           type="button"
-          aria-label="Dismiss"
+          aria-label={t("common:actions.dismiss")}
           onClick={onDismiss}
           className="flex size-6 items-center justify-center rounded-md text-white/50 transition-colors hover:bg-white/10 hover:text-white"
         >
@@ -93,6 +98,7 @@ function _UpdateDownloadingCard({
   version: string;
   onDismiss: () => void;
 }) {
+  const { t } = useTranslation(["updates", "common"]);
   return (
     <div className="w-[356px] max-w-[calc(100vw-2rem)] rounded-2xl border border-white/15 bg-black/45 p-3.5 text-white shadow-2xl backdrop-blur-md">
       <div className="flex items-center gap-3">
@@ -100,14 +106,16 @@ function _UpdateDownloadingCard({
           <Loader2Icon className="size-4 animate-spin" />
         </div>
         <div className="min-w-0 grow">
-          <div className="text-sm font-medium">Downloading update</div>
+          <div className="text-sm font-medium">
+            {t("updates:cards.downloadingTitle")}
+          </div>
           <div className="truncate text-xs text-white/65">
-            v{version} — this continues in the background.
+            {t("updates:cards.downloadingDescription", { version })}
           </div>
         </div>
         <button
           type="button"
-          aria-label="Dismiss"
+          aria-label={t("common:actions.dismiss")}
           onClick={onDismiss}
           className="flex size-6 shrink-0 items-center justify-center rounded-md text-white/50 transition-colors hover:bg-white/10 hover:text-white"
         >
@@ -139,6 +147,7 @@ const UpdateStatusContext = createContext<UpdateStatusValue | null>(null);
  *   that same manual flow to the silent path instead of re-popping the dialog.
  */
 export function UpdateStatusProvider({ children }: { children: ReactNode }) {
+  const i18n = getStableRendererI18n();
   const { executeCommand } = useCommands();
   const [readyVersion, setReadyVersion] = useState<string | null>(null);
   const lastNotifiedVersion = useRef<string | null>(null);
@@ -183,6 +192,9 @@ export function UpdateStatusProvider({ children }: { children: ReactNode }) {
         case "checking":
         case "up-to-date":
         case "error": {
+          if (status.state === "error") {
+            console.error("Update check failed:", status.message);
+          }
           if (status.state !== "checking") toast.dismiss(DOWNLOADING_TOAST_ID);
           if (status.state === "checking") dismissedRef.current = false;
           if (manual && !dismissedRef.current) {
@@ -253,9 +265,9 @@ export function UpdateStatusProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
     void rpc.request.pendingInstalledVersion({}).then((version) => {
       if (cancelled || !version) return;
-      toast.success(`Updated to v${version}`, {
+      toast.success(i18n.t("updates:toast.updated", { version }), {
         action: {
-          label: "Release notes",
+          label: i18n.t("updates:toast.releaseNotes"),
           onClick: () =>
             executeCommand({
               type: "openLink",
@@ -267,7 +279,7 @@ export function UpdateStatusProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [executeCommand]);
+  }, [executeCommand, i18n]);
 
   return (
     <UpdateStatusContext.Provider value={{ readyVersion }}>

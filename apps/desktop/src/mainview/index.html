@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="h-screen w-screen" suppressHydrationWarning>
+<html lang="en-US" class="h-screen w-screen" suppressHydrationWarning>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -26,7 +26,9 @@
             var n = parseInt(primary.slice(1), 16);
             var lin = function (c) {
               var s = c / 255;
-              return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+              return s <= 0.03928
+                ? s / 12.92
+                : Math.pow((s + 0.055) / 1.055, 2.4);
             };
             var lum =
               0.2126 * lin((n >> 16) & 255) +

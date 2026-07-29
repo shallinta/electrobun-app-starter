@@ -1,0 +1,49 @@
+{
+  "dialog": {
+    "checking": {
+      "title": "正在检查更新",
+      "description": "正在连接更新服务器…"
+    },
+    "downloading": {
+      "title": "正在下载更新",
+      "description": "正在准备安装版本 {{version}}…",
+      "background": "在后台继续"
+    },
+    "upToDate": {
+      "title": "已是最新版本",
+      "description": "你正在使用最新版本 v{{version}}。",
+      "confirm": "知道了"
+    },
+    "ready": {
+      "title": "更新已就绪",
+      "description": "版本 {{version}} 已下载并可以安装，重新启动只需片刻。",
+      "restartNow": "立即重新启动"
+    },
+    "error": {
+      "title": "更新检查失败",
+      "description": "请重试，并查看应用日志了解详情。"
+    }
+  },
+  "indicator": {
+    "tooltip": "更新已就绪 — 重新启动以安装",
+    "ariaLabel": "更新已就绪",
+    "title": "更新已就绪",
+    "description": "v{{version}} 已下载，重新启动以安装。",
+    "restartNow": "立即重新启动"
+  },
+  "cards": {
+    "readyTitle": "更新已就绪",
+    "readyDescription": "v{{version}} 已可安装。",
+    "restart": "重新启动",
+    "downloadingTitle": "正在下载更新",
+    "downloadingDescription": "正在后台下载 v{{version}}。"
+  },
+  "toast": {
+    "updated": "已更新至 v{{version}}",
+    "releaseNotes": "发行说明"
+  },
+  "errors": {
+    "saveSettings": "无法保存软件更新设置。",
+    "loadSettings": "无法加载软件更新设置。"
+  }
+}

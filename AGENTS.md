@@ -140,6 +140,29 @@ the same change.
 
 The application icon lives in `apps/desktop/icon.iconset`.
 
+## Localization
+
+The app shell supports only `en-US` and `zh-CN`. User-visible renderer copy
+belongs in the JSON namespaces under
+`apps/desktop/src/shared/i18n/resources/{en-US,zh-CN}`; keep namespace names and
+keys synchronized between both locales. Bun-native menu and dialog copy must use
+the plain i18next runtime in `apps/desktop/src/bun/i18n`.
+
+The Bun process is the locale source of truth. On first launch it maps Chinese
+system-locale variants to `zh-CN` and every other locale to `en-US`, then
+persists the selection in the app data directory at `settings/locale.json`.
+Renderer code must use the typed `getLocale`, `setLocale`, and `localeChanged`
+RPC surface rather than creating another persistent locale store. Locale
+changes must keep the React runtime, document `lang`/`dir`, and rebuilt native
+menus synchronized. Keep the bilingual startup-failure fallback independent of
+successful renderer i18n initialization.
+
+Do not translate command discriminants, RPC names, log fields, or persisted enum
+values. Command display labels belong in the `commands` catalog rather than
+`COMMAND_META`. Run the locale parity tests in
+`apps/desktop/src/shared/i18n/index.test.ts` and the normal typecheck whenever
+catalogs or locale wiring change.
+
 ## Conventions
 
 - TypeScript is strict, targets ESNext, and uses bundler module resolution.

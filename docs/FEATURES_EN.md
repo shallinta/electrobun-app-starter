@@ -34,7 +34,7 @@ This catalog separates capabilities connected to the default application shell f
 
 - **Capability:** Connects the trusted Bun process and WebView renderer through one shared TypeScript contract.
 - **Use cases:** Renderer UI needs to request native capabilities or receive main-process state changes.
-- **Shell status:** Connected for updates, commands, and full-screen state.
+- **Shell status:** Connected for updates, commands, full-screen state, and localization synchronization through `getLocale`, `setLocale`, and `localeChanged`.
 - **How to connect:** Declare a request or message in the shared schema, then implement its Bun handler and renderer call site; validate sensitive inputs again at the Bun boundary.
 - **Code locations:** `apps/desktop/src/shared/rpc.ts`, `apps/desktop/src/bun/rpc/index.ts`, `apps/desktop/src/lib/electrobun.ts`
 
@@ -45,14 +45,14 @@ This catalog separates capabilities connected to the default application shell f
 - **Capability:** Represents menu, command-palette, and renderer actions as one `Command` union with target metadata.
 - **Use cases:** The same action has multiple entry points or must cross the WebView/Bun boundary.
 - **Shell status:** Connected for settings, sidebar, window, link, and update commands.
-- **How to connect:** Register the command in the shared union and `COMMAND_META`, then implement it in the renderer registry or Bun executor; only the active UI owner should register a given renderer command at a time.
+- **How to connect:** Register the command and its target in the shared union and `COMMAND_META`, implement it in the renderer registry or Bun executor, and add its display name to both `commands` catalogs; only the active UI owner should register a given renderer command at a time.
 - **Code locations:** `apps/desktop/src/shared/commands.ts`, `apps/desktop/src/commands/index.tsx`, `apps/desktop/src/bun/commands.ts`
 
 <!-- feature: native-menus -->
 
 ### Native menus and command palette
 
-- **Capability:** Provides macOS application menus, keyboard shortcuts, and a searchable command palette routed through the command layer.
+- **Capability:** Provides locale-rebuilt macOS application menus, keyboard shortcuts, and a searchable command palette routed through the command layer.
 - **Use cases:** Users execute the same behavior from system menus, the keyboard, or in-app search.
 - **Shell status:** Connected for settings, sidebar, zoom, reload, updates, and help links; File menu placeholders remain disabled.
 - **How to connect:** Give each new menu item a stable action mapped to an existing command, and expose only context-free commands in the command palette.
@@ -82,11 +82,21 @@ This catalog separates capabilities connected to the default application shell f
 
 ### Settings shell
 
-- **Capability:** Provides a lazy-loaded Settings dialog with General/About tabs, theme, accent, update mode, and version UI.
+- **Capability:** Provides a lazy-loaded Settings dialog with General/About tabs, language, theme, accent, update mode, and version UI.
 - **Use cases:** A downstream product needs one place for preferences and application information.
 - **Shell status:** Connected to the native menu, command palette, and renderer command.
 - **How to connect:** Add an independent page or section for new settings and place native reads and writes behind typed RPC; keep `SettingsTab` and menu routing synchronized when adding entry points.
 - **Code locations:** `apps/desktop/src/components/settings/`, `apps/desktop/src/app/page.tsx`, `apps/desktop/src/shared/commands.ts`
+
+<!-- feature: localization -->
+
+### Bilingual localization
+
+- **Capability:** Uses i18next to share the `common`, `settings`, `menu`, `commands`, and `updates` JSON namespaces for `en-US` and `zh-CN` between the Bun process and React renderer, switching the shell, native menus, and update messages without restarting.
+- **Use cases:** A downstream product should follow the system language on first launch while letting users explicitly choose English or Simplified Chinese.
+- **Shell status:** Connected to Settings, the main shell, command palette, update UI, and every native menu item; Bun is the single locale source of truth, maps Chinese system locales to `zh-CN` and all others to `en-US` on first launch, persists the result in the application data directory's `settings/locale.json`, and synchronizes the renderer through the typed `getLocale`, `setLocale`, and `localeChanged` RPC surface.
+- **How to connect:** Add matching keys to the same namespace in both locale directories and consume them through React `useTranslation` or Bun `translate`; renderer initialization synchronizes document `lang`/`dir`, Bun rebuilds native menus, and the startup initialization failure screen uses a bilingual fallback; after brand or copy changes, run strict key typechecking and the locale parity tests.
+- **Code locations:** `apps/desktop/src/shared/i18n/`, `apps/desktop/src/bun/i18n/`, `apps/desktop/src/lib/renderer-i18n.ts`, `apps/desktop/src/hooks/use-locale.ts`, `apps/desktop/src/mainview/main.tsx`, `apps/desktop/src/shared/rpc.ts`
 
 <!-- feature: external-url-security -->
 

@@ -8,6 +8,7 @@ import {
   PopoverTrigger,
 } from "@shallinta/ui/ui/popover";
 import { ArrowDownToLineIcon } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { useCommands } from "@/commands";
 import { useUpdateStatus } from "@/components/update-status-provider";
@@ -19,18 +20,19 @@ import { useUpdateStatus } from "@/components/update-status-provider";
  * action.
  */
 export function UpdateIndicator() {
+  const { t } = useTranslation("updates");
   const { readyVersion } = useUpdateStatus();
   const { executeCommand } = useCommands();
   if (!readyVersion) return null;
 
   return (
     <Popover>
-      <Tooltip content="Update ready — restart to install">
+      <Tooltip content={t("indicator.tooltip")}>
         <PopoverTrigger asChild>
           <Button
             size="icon-sm"
             variant="ghost"
-            aria-label="Update ready"
+            aria-label={t("indicator.ariaLabel")}
             className="relative"
           >
             <ArrowDownToLineIcon />
@@ -39,9 +41,9 @@ export function UpdateIndicator() {
         </PopoverTrigger>
       </Tooltip>
       <PopoverContent align="end" className="flex w-64 flex-col gap-2">
-        <span className="text-sm font-medium">Update ready</span>
+        <span className="text-sm font-medium">{t("indicator.title")}</span>
         <span className="text-muted-foreground text-xs">
-          v{readyVersion} has been downloaded. Restart to install.
+          {t("indicator.description", { version: readyVersion })}
         </span>
         <Button
           size="sm"
@@ -50,7 +52,7 @@ export function UpdateIndicator() {
             executeCommand({ type: "applyUpdateAndRestart", args: {} })
           }
         >
-          Restart Now
+          {t("indicator.restartNow")}
         </Button>
       </PopoverContent>
     </Popover>

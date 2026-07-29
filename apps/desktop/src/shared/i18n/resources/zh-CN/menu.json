@@ -1,0 +1,49 @@
+{
+  "app": {
+    "about": "关于 Electrobun App Starter",
+    "checkForUpdates": "检查更新…",
+    "restartToUpdate": "重新启动以更新",
+    "settings": "设置…",
+    "hide": "隐藏 Electrobun App Starter",
+    "hideOthers": "隐藏其他应用",
+    "showAll": "全部显示",
+    "quit": "退出 Electrobun App Starter"
+  },
+  "file": {
+    "title": "文件",
+    "new": "新建…",
+    "open": "打开…"
+  },
+  "edit": {
+    "title": "编辑",
+    "undo": "撤销",
+    "redo": "重做",
+    "cut": "剪切",
+    "copy": "复制",
+    "paste": "粘贴",
+    "pasteAndMatchStyle": "粘贴并匹配样式",
+    "delete": "删除",
+    "selectAll": "全选"
+  },
+  "view": {
+    "title": "视图",
+    "toggleSidebar": "切换侧栏",
+    "commandPalette": "命令面板…",
+    "reload": "重新加载",
+    "zoomIn": "放大",
+    "zoomOut": "缩小",
+    "resetZoom": "重置缩放"
+  },
+  "window": {
+    "title": "窗口",
+    "minimize": "最小化",
+    "bringAllToFront": "全部置于顶层",
+    "toggleFullScreen": "切换全屏"
+  },
+  "help": {
+    "title": "帮助",
+    "documentation": "查看文档",
+    "homepage": "访问官方网站",
+    "repository": "访问 GitHub 项目"
+  }
+}

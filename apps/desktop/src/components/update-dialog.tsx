@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@shallinta/ui/ui/dialog";
+import type { TFunction } from "i18next";
 import {
   CheckIcon,
   DownloadIcon,
@@ -18,6 +19,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 
 import type { UpdateStatus } from "@/shared/updates";
 
@@ -81,7 +83,8 @@ function UpdateDialogBody({
   onRetry: () => void;
   onClose: () => void;
 }) {
-  const view = viewFor(status, { onRestart, onRetry, onClose });
+  const { t } = useTranslation(["updates", "common"]);
+  const view = viewFor(status, { onRestart, onRetry, onClose }, t);
   return (
     <div className="flex flex-col items-center px-6 pt-8 pb-6 text-center">
       <IconBadge tone={view.tone} icon={view.icon} spin={view.spin} />
@@ -107,7 +110,8 @@ function viewFor(
     onRestart,
     onRetry,
     onClose,
-  }: { onRestart: () => void; onRetry: () => void; onClose: () => void }
+  }: { onRestart: () => void; onRetry: () => void; onClose: () => void },
+  t: TFunction<["updates", "common"]>
 ): View {
   switch (status.state) {
     case "checking":
@@ -116,8 +120,8 @@ function viewFor(
         icon: Loader2Icon,
         spin: true,
         progress: true,
-        title: "Checking for updates",
-        description: "Contacting the update server…",
+        title: t("updates:dialog.checking.title"),
+        description: t("updates:dialog.checking.description"),
         actions: null,
       };
     case "downloading":
@@ -126,11 +130,13 @@ function viewFor(
         icon: Loader2Icon,
         spin: true,
         progress: true,
-        title: "Downloading update",
-        description: `Getting version ${status.version} ready to install…`,
+        title: t("updates:dialog.downloading.title"),
+        description: t("updates:dialog.downloading.description", {
+          version: status.version,
+        }),
         actions: (
           <Button size="sm" variant="outline" onClick={onClose}>
-            Continue in background
+            {t("updates:dialog.downloading.background")}
           </Button>
         ),
       };
@@ -138,11 +144,13 @@ function viewFor(
       return {
         tone: "success",
         icon: CheckIcon,
-        title: "You're all set!",
-        description: `You're already running the latest version — v${status.version}.`,
+        title: t("updates:dialog.upToDate.title"),
+        description: t("updates:dialog.upToDate.description", {
+          version: status.version,
+        }),
         actions: (
           <Button size="sm" onClick={onClose}>
-            Gotcha
+            {t("updates:dialog.upToDate.confirm")}
           </Button>
         ),
       };
@@ -150,15 +158,17 @@ function viewFor(
       return {
         tone: "primary",
         icon: DownloadIcon,
-        title: "Update ready",
-        description: `Version ${status.version} has been downloaded and is ready to install. Restarting takes just a moment.`,
+        title: t("updates:dialog.ready.title"),
+        description: t("updates:dialog.ready.description", {
+          version: status.version,
+        }),
         actions: (
           <>
             <Button size="sm" variant="outline" onClick={onClose}>
-              Later
+              {t("common:actions.later")}
             </Button>
             <Button size="sm" onClick={onRestart}>
-              Restart now
+              {t("updates:dialog.ready.restartNow")}
             </Button>
           </>
         ),
@@ -167,15 +177,15 @@ function viewFor(
       return {
         tone: "danger",
         icon: TriangleAlertIcon,
-        title: "Update check failed",
-        description: status.message,
+        title: t("updates:dialog.error.title"),
+        description: t("updates:dialog.error.description"),
         actions: (
           <>
             <Button size="sm" variant="outline" onClick={onClose}>
-              Close
+              {t("common:actions.close")}
             </Button>
             <Button size="sm" onClick={onRetry}>
-              Try again
+              {t("common:actions.tryAgain")}
             </Button>
           </>
         ),

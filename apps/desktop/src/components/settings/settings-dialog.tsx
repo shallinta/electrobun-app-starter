@@ -8,6 +8,7 @@ import {
   TabsTrigger,
 } from "@shallinta/ui/ui/tabs";
 import { Info, SlidersHorizontal } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import type { SettingsTab } from "@/shared/commands";
 
@@ -17,12 +18,13 @@ import { GeneralPage } from "./general-page";
 import { SettingsPage } from "./settings-page";
 
 function AboutPage() {
+  const { t } = useTranslation(["settings", "common"]);
   return (
-    <SettingsPage title="About">
+    <SettingsPage title={t("settings:about")}>
       <div className="flex h-full flex-col items-center justify-center gap-2">
-        <div className="text-lg font-semibold">Electrobun App Starter</div>
+        <div className="text-lg font-semibold">{t("common:appName")}</div>
         <div className="text-muted-foreground text-sm">
-          Version {pkg.version}
+          {t("settings:version", { version: pkg.version })}
         </div>
       </div>
     </SettingsPage>
@@ -32,11 +34,11 @@ function AboutPage() {
 const TABS = [
   {
     value: "general",
-    label: "General",
+    labelKey: "general",
     icon: SlidersHorizontal,
     Page: GeneralPage,
   },
-  { value: "about", label: "About", icon: Info, Page: AboutPage },
+  { value: "about", labelKey: "about", icon: Info, Page: AboutPage },
 ] as const;
 
 export function SettingsDialog({
@@ -50,6 +52,7 @@ export function SettingsDialog({
   tab: SettingsTab;
   onTabChange: (tab: SettingsTab) => void;
 }) {
+  const { t } = useTranslation("settings");
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
@@ -65,13 +68,13 @@ export function SettingsDialog({
         >
           <aside className="bg-muted/30 flex w-50 shrink-0 flex-col gap-2 border-r p-3">
             <header>
-              <div className="text-base font-medium">Settings</div>
+              <div className="text-base font-medium">{t("title")}</div>
             </header>
             <TabsList className="h-fit w-full flex-col gap-0.5 bg-transparent p-0">
-              {TABS.map(({ value, label, icon: Icon }) => (
+              {TABS.map(({ value, labelKey, icon: Icon }) => (
                 <TabsTrigger key={value} value={value} className="w-full">
                   <Icon />
-                  {label}
+                  {t(labelKey)}
                 </TabsTrigger>
               ))}
             </TabsList>

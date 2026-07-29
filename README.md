@@ -19,7 +19,7 @@
 - 两个运行时上下文之间的类型安全 RPC 边界和命令路由。
 - 原生窗口与菜单管理、窗口状态持久化、可折叠侧栏，以及安全的外部链接处理。
 - 全屏状态 RPC、渲染端订阅基础和最大化命令；自定义标题栏 UI 由下游应用按需挂载。
-- 主题、主色、软件更新和关于设置。
+- 支持 `en-US`/`zh-CN` 动态切换且由 Bun 持久化语言偏好的国际化外壳，以及主题、主色、软件更新和关于设置。
 - 自动更新基础设施，以及面向 Apple Silicon 和 Intel 的 macOS 发布工作流。
 - 可选的本地 CEF/CDP 诊断命令；默认开发和所有发行构建仍使用系统 WebView。
 - 基于 Tailwind CSS 和 shadcn/ui primitives 的共享 UI 包。
@@ -96,6 +96,36 @@ Bun 主进程负责原生能力。渲染进程通过
 Bun 的模块。跨运行时用户操作统一使用
 `apps/desktop/src/shared/commands.ts` 中定义的命令。
 
+<!-- i18n: localization -->
+
+## 双语国际化
+
+应用外壳仅支持 `en-US` 和 `zh-CN`。Bun 主进程是 locale
+的唯一数据源：首次启动时，系统 locale 的所有中文变体都映射为 `zh-CN`，其余语言映射为
+`en-US`；选择结果写入应用数据目录下的
+`settings/locale.json`（默认完整路径为
+`~/.electrobun-app-starter/settings/locale.json`），以后启动优先使用该持久化值。
+
+渲染进程通过类型化 RPC `getLocale` 读取初始值，通过 `setLocale`
+提交设置变更，并订阅 `localeChanged`。切换成功后，React
+界面、命令面板和更新文案会刷新，文档根节点的 `lang`/`dir`
+属性会同步更新，Bun 主进程也会使用同一 locale
+重建原生菜单，无需重启应用。若 renderer
+在国际化初始化期间失败，启动错误页会同时显示英文和中文文案，保证用户仍能理解错误并重试。
+
+翻译资源位于
+`apps/desktop/src/shared/i18n/resources/{en-US,zh-CN}/`，按
+`common`、`settings`、`menu`、`commands` 和 `updates` JSON namespace
+拆分。新增或修改用户可见文案时：
+
+1. 在两套语言目录的相同 namespace 中同步增加相同 key。
+2. React 组件使用 `useTranslation`，Bun 原生菜单或对话框使用
+   `apps/desktop/src/bun/i18n` 提供的翻译函数。
+3. 不要翻译 command discriminant、RPC 名称、日志字段或持久化枚举值。
+4. 运行 `mise run typecheck` 验证严格 key 类型，并运行
+   `bun test apps/desktop/src/shared/i18n/index.test.ts`
+   验证 namespace、key 和支持语言保持一致。
+
 <!-- i18n: customize -->
 
 ## 定制脚手架
@@ -118,10 +148,9 @@ RPC 和命令边界扩展原生能力。
 - [ ] 修改 `apps/desktop/electrobun.config.ts` 中的应用名称（`app.name`，当前为
       `Electrobun App Starter`），并同步替换
       `apps/desktop/src/mainview/index.html`、
-      `apps/desktop/src/app/page.tsx`、
-      `apps/desktop/src/components/settings/settings-dialog.tsx`、
       `apps/desktop/src/bun/app/window.ts` 和
-      `apps/desktop/src/bun/app/menu.ts` 中所有用户可见文本。
+      `apps/desktop/src/shared/i18n/resources/` 两套语言目录中的品牌文案。任何新增或修改的品牌相关用户可见文案都必须同步更新
+      `en-US` 与 `zh-CN` catalog，并通过严格 key 类型检查和 locale parity 测试。
 - [ ] 在 `apps/desktop/electrobun.config.ts` 中设置归属于你所在组织的 bundle
       identifier（`app.identifier`，当前为
       `com.shallinta.electrobun-app-starter`）。发布后应将其视为永久标识，因为已安装应用和更新器状态都依赖它识别应用。

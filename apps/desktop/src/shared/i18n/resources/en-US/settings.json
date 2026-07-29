@@ -1,0 +1,41 @@
+{
+  "title": "Settings",
+  "general": "General",
+  "about": "About",
+  "version": "Version {{version}}",
+  "appearance": "Appearance",
+  "language": {
+    "title": "Language",
+    "hint": "Choose the language used by the application.",
+    "saveError": "Couldn’t save the application language.",
+    "options": {
+      "en-US": "English (US)",
+      "zh-CN": "简体中文"
+    }
+  },
+  "theme": {
+    "title": "Theme",
+    "hint": "Match your system setting, or force light or dark.",
+    "options": {
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    }
+  },
+  "primaryColor": {
+    "title": "Primary color",
+    "hint": "The accent color for buttons, links, and highlights."
+  },
+  "updates": {
+    "section": "Updates",
+    "title": "Software updates",
+    "hint": "Automatic mode downloads updates in the background and prompts you to restart.",
+    "ariaLabel": "Software updates",
+    "options": {
+      "automatic": "Automatic",
+      "manual": "Check manually",
+      "off": "Off"
+    },
+    "checkNow": "Check now"
+  }
+}

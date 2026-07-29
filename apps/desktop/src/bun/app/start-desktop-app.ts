@@ -1,3 +1,4 @@
+import { getSettingsDir } from "@shallinta/shared/server";
 import Electrobun, {
   app,
   type BrowserWindow,
@@ -7,9 +8,12 @@ import Electrobun, {
 
 import type { Command } from "../../shared/commands";
 import { executeCommandInBun } from "../commands";
+import { createLocaleController } from "../i18n/controller";
+import { createLocaleStateStore } from "../i18n/state";
 import { createMainWindowRPC, type MainWindowRPC } from "../rpc";
 import { UpdaterService } from "../updates";
 
+import { setLocaleInMenu } from "./menu";
 import { createShutdownCoordinator } from "./shutdown-coordinator";
 import { createMainWindow, type ManagedMainWindow } from "./window";
 
@@ -55,9 +59,20 @@ export async function startDesktopApp(): Promise<DesktopAppRuntime> {
   };
 
   try {
+    const locale = createLocaleController({
+      store: createLocaleStateStore(
+        getSettingsDir(),
+        () => Intl.DateTimeFormat().resolvedOptions().locale
+      ),
+      activateLocale: setLocaleInMenu,
+      onLocaleChanged: (nextLocale) =>
+        getRpc().send.localeChanged({ locale: nextLocale }),
+    });
+    await locale.initialize();
     rpc = createMainWindowRPC({
       executeCommand: (command) => executeCommand(command, getMainWindow()),
       getMainWindow,
+      locale,
       updater,
     });
     mainWindow = await createMainWindow({

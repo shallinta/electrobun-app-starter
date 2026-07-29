@@ -11,6 +11,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useTranslation } from "react-i18next";
 import { usePanelRef } from "react-resizable-panels";
 
 import { CommandProvider, useCommands, useRegisterCommands } from "@/commands";
@@ -49,6 +50,7 @@ export function Page() {
 }
 
 function PageInner() {
+  const { t } = useTranslation("common");
   const { executeCommand } = useCommands();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsTab, setSettingsTab] = useState<SettingsTab>("general");
@@ -94,7 +96,7 @@ function PageInner() {
             onResize={({ inPixels }) => persistSidebarSize(inPixels)}
           >
             <span className="text-muted-foreground text-sm">
-              Add your navigation here.
+              {t("shell.navigationPlaceholder")}
             </span>
           </ResizablePanel>
           <ResizableHandle />
@@ -106,9 +108,9 @@ function PageInner() {
               <UpdateIndicator />
             </div>
             <div className="text-center">
-              <h1 className="text-2xl font-semibold">Electrobun App Starter</h1>
+              <h1 className="text-2xl font-semibold">{t("appName")}</h1>
               <p className="text-muted-foreground mt-2 text-sm">
-                Replace this content with your desktop application.
+                {t("shell.contentPlaceholder")}
               </p>
             </div>
           </ResizablePanel>

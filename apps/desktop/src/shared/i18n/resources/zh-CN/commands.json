@@ -1,0 +1,15 @@
+{
+  "openSettings": "设置",
+  "openCommandPalette": "命令面板",
+  "toggleSidebar": "切换侧栏",
+  "zoomIn": "放大",
+  "zoomOut": "缩小",
+  "resetZoom": "重置缩放",
+  "reload": "重新加载",
+  "toggleMaximized": "切换最大化",
+  "openLink": "打开链接",
+  "checkForUpdates": "检查更新…",
+  "applyUpdateAndRestart": "重新启动以更新",
+  "searchPlaceholder": "搜索命令…",
+  "empty": "未找到命令。"
+}

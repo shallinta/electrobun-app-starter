@@ -1,0 +1,15 @@
+{
+  "openSettings": "Settings",
+  "openCommandPalette": "Command Palette",
+  "toggleSidebar": "Toggle Sidebar",
+  "zoomIn": "Zoom In",
+  "zoomOut": "Zoom Out",
+  "resetZoom": "Reset Zoom",
+  "reload": "Reload",
+  "toggleMaximized": "Toggle Maximize",
+  "openLink": "Open Link",
+  "checkForUpdates": "Check for Updates...",
+  "applyUpdateAndRestart": "Restart to Update",
+  "searchPlaceholder": "Search commands...",
+  "empty": "No commands found."
+}

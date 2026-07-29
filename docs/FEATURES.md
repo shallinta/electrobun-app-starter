@@ -34,7 +34,7 @@
 
 - **功能：** 以一份共享 TypeScript 契约连接可信 Bun 主进程与 WebView 渲染进程。
 - **使用场景：** 渲染界面需要请求原生能力或接收主进程状态变化。
-- **外壳状态：** 已接入更新、命令和全屏状态通道。
+- **外壳状态：** 已接入更新、命令、全屏状态以及 `getLocale`、`setLocale`、`localeChanged` 国际化同步。
 - **接入方式：** 先在共享 schema 中声明 request 或 message，再在 Bun handler 与渲染端调用处分别实现；敏感参数仍须在 Bun 边界校验。
 - **代码位置：** `apps/desktop/src/shared/rpc.ts`、`apps/desktop/src/bun/rpc/index.ts`、`apps/desktop/src/lib/electrobun.ts`
 
@@ -45,14 +45,14 @@
 - **功能：** 用带目标元数据的统一 `Command` 表达菜单、命令面板和渲染控件触发的用户动作。
 - **使用场景：** 同一个动作需要从多个入口触发，或需要跨 WebView 与 Bun 边界执行。
 - **外壳状态：** 已接入设置、侧栏、窗口、链接与更新命令。
-- **接入方式：** 在共享 union 与 `COMMAND_META` 注册命令，按目标在渲染 registry 或 Bun executor 实现；同一渲染命令同一时间只应由当前界面所有者注册。
+- **接入方式：** 在共享 union 与 `COMMAND_META` 注册命令目标，按目标在渲染 registry 或 Bun executor 实现，并在双语 `commands` catalog 增加显示名；同一渲染命令同一时间只应由当前界面所有者注册。
 - **代码位置：** `apps/desktop/src/shared/commands.ts`、`apps/desktop/src/commands/index.tsx`、`apps/desktop/src/bun/commands.ts`
 
 <!-- feature: native-menus -->
 
 ### 原生菜单与命令面板
 
-- **功能：** 提供 macOS 应用菜单、快捷键和可搜索命令面板，并统一转发到命令层。
+- **功能：** 提供可随 locale 重建的 macOS 应用菜单、快捷键和可搜索命令面板，并统一转发到命令层。
 - **使用场景：** 用户通过系统菜单、键盘或应用内面板执行相同行为。
 - **外壳状态：** 已接入设置、侧栏、缩放、重载、更新与帮助链接；文件菜单占位项保持禁用。
 - **接入方式：** 给新菜单项分配稳定 action 并映射到已有命令；仅将适合无上下文执行的命令暴露到命令面板。
@@ -82,11 +82,21 @@
 
 ### 设置外壳
 
-- **功能：** 提供延迟加载的设置对话框、General/About 标签页、主题主色、更新模式和版本展示。
+- **功能：** 提供延迟加载的设置对话框、General/About 标签页、语言、主题主色、更新模式和版本展示。
 - **使用场景：** 下游产品需要集中承载用户偏好和应用信息。
 - **外壳状态：** 已接入原生菜单、命令面板和渲染命令。
 - **接入方式：** 为新设置增加独立页面或 section，并将原生读写放到类型化 RPC 后；同步扩展 `SettingsTab` 与菜单入口时保持命令路由一致。
 - **代码位置：** `apps/desktop/src/components/settings/`、`apps/desktop/src/app/page.tsx`、`apps/desktop/src/shared/commands.ts`
+
+<!-- feature: localization -->
+
+### 双语国际化
+
+- **功能：** 使用 i18next 在 Bun 主进程与 React renderer 共享 `en-US`、`zh-CN` 的 `common`、`settings`、`menu`、`commands`、`updates` JSON namespace，支持不重启应用切换界面、原生菜单和更新提示语言。
+- **使用场景：** 下游产品需要随系统语言首启，并允许用户在设置中显式选择英文或简体中文。
+- **外壳状态：** 已接入设置页、主要壳页面、命令面板、更新界面和全部原生菜单项；Bun 是 locale 唯一数据源，首次将中文系统 locale 映射为 `zh-CN`、其余映射为 `en-US`，持久化到应用数据目录的 `settings/locale.json`，并通过 `getLocale`、`setLocale`、`localeChanged` 类型化 RPC 同步 renderer。
+- **接入方式：** 在两套语言目录的相同 namespace 中同步增加相同 key，并通过 React `useTranslation` 或 Bun `translate` 消费；renderer 初始化会同步文档 `lang`/`dir`，Bun 会重建原生菜单，启动初始化失败页使用中英双语 fallback；修改品牌或文案后运行严格 key 类型检查和 locale parity 测试。
+- **代码位置：** `apps/desktop/src/shared/i18n/`、`apps/desktop/src/bun/i18n/`、`apps/desktop/src/lib/renderer-i18n.ts`、`apps/desktop/src/hooks/use-locale.ts`、`apps/desktop/src/mainview/main.tsx`、`apps/desktop/src/shared/rpc.ts`
 
 <!-- feature: external-url-security -->
 

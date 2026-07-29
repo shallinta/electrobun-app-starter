@@ -1,0 +1,19 @@
+{
+  "appName": "Electrobun App Starter",
+  "shell": {
+    "navigationPlaceholder": "Add your navigation here.",
+    "contentPlaceholder": "Replace this content with your desktop application."
+  },
+  "startupFailure": {
+    "title": "Unable to start the application",
+    "description": "Check the application logs, then try again.",
+    "retry": "Retry"
+  },
+  "actions": {
+    "close": "Close",
+    "dismiss": "Dismiss",
+    "later": "Later",
+    "reset": "Reset",
+    "tryAgain": "Try again"
+  }
+}

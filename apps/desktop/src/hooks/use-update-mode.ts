@@ -1,14 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useSyncExternalStore } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 import { electrobun } from "@/lib/electrobun";
 import { createUpdateModeStore } from "@/lib/update-mode-store";
 import type { UpdateMode } from "@/shared/updates";
-
-const SAVE_ERROR_MESSAGE = "Couldn’t save software update settings.";
-const LOAD_ERROR_MESSAGE = "Couldn’t load software update settings.";
 
 function getRpc() {
   const rpc = electrobun.rpc;
@@ -25,20 +23,12 @@ const updateModeStore = createUpdateModeStore({
 
 let loadPromise: Promise<void> | null = null;
 
-function ensureUpdateModeLoaded(): Promise<void> {
-  loadPromise ??= updateModeStore.load().catch((error) => {
-    loadPromise = null;
-    toast.error(LOAD_ERROR_MESSAGE);
-    console.error(LOAD_ERROR_MESSAGE, error);
-  });
-  return loadPromise;
-}
-
 export function useUpdateMode(): {
   mode: UpdateMode;
   isSaving: boolean;
   change: (mode: UpdateMode) => Promise<void>;
 } {
+  const { t } = useTranslation("updates");
   const snapshot = useSyncExternalStore(
     (listener) => updateModeStore.subscribe(listener),
     () => updateModeStore.getSnapshot(),
@@ -46,17 +36,26 @@ export function useUpdateMode(): {
   );
 
   useEffect(() => {
-    void ensureUpdateModeLoaded();
-  }, []);
+    loadPromise ??= updateModeStore.load().catch((error) => {
+      loadPromise = null;
+      const message = t("errors.loadSettings");
+      toast.error(message);
+      console.error(message, error);
+    });
+  }, [t]);
 
-  const change = useCallback(async (mode: UpdateMode) => {
-    try {
-      await updateModeStore.change(mode);
-    } catch (error) {
-      toast.error(SAVE_ERROR_MESSAGE);
-      console.error(SAVE_ERROR_MESSAGE, error);
-    }
-  }, []);
+  const change = useCallback(
+    async (mode: UpdateMode) => {
+      try {
+        await updateModeStore.change(mode);
+      } catch (error) {
+        const message = t("errors.saveSettings");
+        toast.error(message);
+        console.error(message, error);
+      }
+    },
+    [t]
+  );
 
   return { ...snapshot, change };
 }

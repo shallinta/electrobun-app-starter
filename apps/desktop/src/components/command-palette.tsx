@@ -8,6 +8,7 @@ import {
   CommandItem,
   CommandList,
 } from "@shallinta/ui/ui/command";
+import { useTranslation } from "react-i18next";
 
 import { useCommands } from "@/commands";
 import { useUpdateStatus } from "@/components/update-status-provider";
@@ -34,6 +35,7 @@ export function CommandPalette({
   blacklist?: string[];
 }) {
   const { executeCommand } = useCommands();
+  const { t } = useTranslation("commands");
   const { readyVersion } = useUpdateStatus();
   const { mode: updateMode } = useUpdateMode();
 
@@ -54,12 +56,12 @@ export function CommandPalette({
   return (
     <CommandDialog open={open} onOpenChange={onOpenChange}>
       <Command>
-        <CommandInput placeholder="Search commands..." />
+        <CommandInput placeholder={t("searchPlaceholder")} />
         <CommandList>
-          <CommandEmpty>No commands found.</CommandEmpty>
+          <CommandEmpty>{t("empty")}</CommandEmpty>
           {types.map((type) => (
             <CommandItem key={type} onSelect={() => run(type)}>
-              {COMMAND_META[type].label}
+              {t(type)}
             </CommandItem>
           ))}
         </CommandList>

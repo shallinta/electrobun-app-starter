@@ -70,6 +70,17 @@ mise run dev
 Changes to the React renderer are updated through HMR. Restart the command after
 changing Bun main-process code.
 
+<!-- i18n: create-your-app -->
+
+## Create a new app from the Starter
+
+When using this project as a new product base, isolate app identity, local data,
+and public URLs before product development, then finish signing, notarization,
+and permission configuration before the first release. The
+[Create a new app from the Starter guide](./docs/CREATE_YOUR_APP_EN.md) owns
+execution order and timing; the rebranding checklist later in this README owns
+the concrete defaults and file locations.
+
 <!-- i18n: common-commands -->
 
 ## Common commands
@@ -156,9 +167,11 @@ boundaries.
 
 ### Required rebranding before the first release
 
-Complete every applicable item below before publishing a downstream app under a
-new brand. The current values are starter defaults, not production values for
-your product.
+This checklist is the detailed source of truth for Starter defaults, file
+locations, secrets, permissions, and artifact configuration; follow the
+[Create a new app from the Starter guide](./docs/CREATE_YOUR_APP_EN.md) for
+execution order and timing. The current values are starter defaults, not
+production values for your product.
 
 <!-- i18n: rebrand.brand-identity -->
 

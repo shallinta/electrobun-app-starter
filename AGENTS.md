@@ -9,6 +9,19 @@ The app uses the system WebView renderer. The scaffold does not include a web
 site, embedded Chromium edition, analytics, proxy management, or domain-specific
 backend.
 
+## Downstream app initialization
+
+For tasks that turn this Starter into a downstream product, follow the ordered
+workflow in the [Chinese guide](docs/CREATE_YOUR_APP.md) or
+[English guide](docs/CREATE_YOUR_APP_EN.md). Those guides are the source of truth
+for initialization order and timing. The detailed rebranding checklists in the
+[Chinese README](README.md#首次发布前必须完成的品牌替换) and
+[English README](README_EN.md#required-rebranding-before-the-first-release) are
+the source of truth for concrete Starter defaults, file locations, secrets,
+permissions, and artifact configuration. App identity and persistent-state
+isolation happen before product development, while signing, notarization, and
+product-specific permissions may wait until the first release.
+
 ## Tooling
 
 `mise` is the task front door: `mise tasks ls` lists every supported workflow.

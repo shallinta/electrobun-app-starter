@@ -1,8 +1,10 @@
 {
+  "extends": "./.hutch/devkit/tsconfig.json",
   "compilerOptions": {
-    "target": "ES2020",
+    "target": "ES2021",
+    "types": ["bun", "react", "react-dom"],
     "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "lib": ["ES2021", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
     "moduleResolution": "bundler",
@@ -11,13 +13,79 @@
     "isolatedModules": true,
     "moduleDetection": "force",
     "noEmit": true,
+    "ignoreDeprecations": "6.0",
     "jsx": "react-jsx",
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "incremental": true,
+    "baseUrl": ".",
     "paths": {
+      // A child `paths` object replaces the devkit's inherited object, so keep
+      // its canonical public SDK entries here alongside the app-local alias.
+      "electrobun": ["./.hutch/devkit/api/sdks/main/index.ts"],
+      "electrobun/main": ["./.hutch/devkit/api/sdks/main/index.ts"],
+      "electrobun/main/app-menu": [
+        "./.hutch/devkit/api/sdks/main/entries/app-menu.ts"
+      ],
+      "electrobun/main/browser-view": [
+        "./.hutch/devkit/api/sdks/main/entries/browser-view.ts"
+      ],
+      "electrobun/main/browser-window": [
+        "./.hutch/devkit/api/sdks/main/entries/browser-window.ts"
+      ],
+      "electrobun/main/build-config": [
+        "./.hutch/devkit/api/sdks/main/entries/build-config.ts"
+      ],
+      "electrobun/main/context-menu": [
+        "./.hutch/devkit/api/sdks/main/entries/context-menu.ts"
+      ],
+      "electrobun/main/events": [
+        "./.hutch/devkit/api/sdks/main/entries/events.ts"
+      ],
+      "electrobun/main/gpu-window": [
+        "./.hutch/devkit/api/sdks/main/entries/gpu-window.ts"
+      ],
+      "electrobun/main/native": [
+        "./.hutch/devkit/api/sdks/main/entries/native.ts"
+      ],
+      "electrobun/main/paths": [
+        "./.hutch/devkit/api/sdks/main/entries/paths.ts"
+      ],
+      "electrobun/main/rpc": ["./.hutch/devkit/api/sdks/main/entries/rpc.ts"],
+      "electrobun/main/socket": [
+        "./.hutch/devkit/api/sdks/main/entries/socket.ts"
+      ],
+      "electrobun/main/tray": ["./.hutch/devkit/api/sdks/main/entries/tray.ts"],
+      "electrobun/main/ui": ["./.hutch/devkit/api/sdks/main/entries/ui.ts"],
+      "electrobun/main/ui/jsx-runtime": [
+        "./.hutch/devkit/api/sdks/main/ui/jsx-runtime.ts"
+      ],
+      "electrobun/main/ui/jsx-dev-runtime": [
+        "./.hutch/devkit/api/sdks/main/ui/jsx-dev-runtime.ts"
+      ],
+      "electrobun/main/updater": [
+        "./.hutch/devkit/api/sdks/main/entries/updater.ts"
+      ],
+      "electrobun/main/utils": [
+        "./.hutch/devkit/api/sdks/main/entries/utils.ts"
+      ],
+      "electrobun/main/webgpu": [
+        "./.hutch/devkit/api/sdks/main/entries/webgpu.ts"
+      ],
+      "electrobun/main/wgpu-view": [
+        "./.hutch/devkit/api/sdks/main/entries/wgpu-view.ts"
+      ],
+      "electrobun/rpc": ["./.hutch/devkit/api/sdks/main/entries/rpc.ts"],
+      "electrobun/view": ["./.hutch/devkit/api/browser/index.ts"],
+      "electrobun/browser/ui": ["./.hutch/devkit/api/browser/ui/index.ts"],
+      "electrobun/browser/ui/jsx-runtime": [
+        "./.hutch/devkit/api/browser/ui/jsx-runtime.ts"
+      ],
+      "electrobun/browser/ui/jsx-dev-runtime": [
+        "./.hutch/devkit/api/browser/ui/jsx-dev-runtime.ts"
+      ],
       "@/*": ["./src/*"]
     }
   },

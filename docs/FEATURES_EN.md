@@ -152,11 +152,11 @@ This catalog separates capabilities connected to the default application shell f
 
 ### Packaging and release pipeline
 
-- **Capability:** Builds, signs, notarizes, and publishes arm64/x64 artifacts and update feeds through atomic stable or canary version commits and tags.
+- **Capability:** Builds, signs, notarizes, and publishes Apple Silicon arm64 artifacts and update feeds through atomic stable or canary version commits and tags. Electrobun 2.x does not currently publish a macOS x64 core, so the default pipeline no longer produces Intel artifacts.
 - **Use cases:** A downstream product needs reproducible, verifiable macOS delivery.
 - **Shell status:** Connected through local packaging tasks, release preflight, and the GitHub release workflow.
-- **How to connect:** Before the first release, replace bundle ID, icons, certificates, App Store Connect credentials, repository URLs, and feed branding; never bypass preflight or push a release tag independently.
-- **Code locations:** `scripts/release.ts`, `.github/workflows/release.yml`, `apps/desktop/electrobun.config.ts`
+- **How to connect:** Before the first release, replace the bundle ID, Icon Composer `.icon`, certificates, App Store Connect credentials, repository URLs, and feed branding; icon packaging requires `actool` from a full Xcode 26+ installation, and release tags must still pass preflight and be pushed atomically.
+- **Code locations:** `scripts/release.ts`, `.github/workflows/release.yml`, `apps/desktop/electrobun.config.ts`, `apps/desktop/AppIcon.icon`
 
 ## Disconnected or future options
 

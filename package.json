@@ -18,7 +18,7 @@
     "lint:fix": "eslint --fix .",
     "check:feature-docs": "bun scripts/check-feature-docs.ts",
     "check:lockfile": "bun scripts/check-lockfile-registry.ts",
-    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p packages/ui/tsconfig.json && tsc --noEmit -p apps/desktop/tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p packages/ui/tsconfig.json && bun run --cwd apps/desktop prepare:electrobun && tsc --noEmit -p apps/desktop/tsconfig.json",
     "prepare": "husky"
   },
   "lint-staged": {

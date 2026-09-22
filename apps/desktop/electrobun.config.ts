@@ -8,18 +8,18 @@ import packageJson from "./package.json";
 //   ELECTROBUN_APP_STARTER_SKIP_SIGNING=1  → unsigned canary/stable build
 //   ELECTROBUN_APP_STARTER_SKIP_NOTARIZE=1 → sign but skip notarization
 //   ELECTROBUN_APP_STARTER_UPDATE_BASE_URL → use a local update feed
-const skipSigning = Boolean(Bun.env.ELECTROBUN_APP_STARTER_SKIP_SIGNING);
+const skipSigning = Boolean(process.env.ELECTROBUN_APP_STARTER_SKIP_SIGNING);
 const skipNotarize =
-  skipSigning || Boolean(Bun.env.ELECTROBUN_APP_STARTER_SKIP_NOTARIZE);
+  skipSigning || Boolean(process.env.ELECTROBUN_APP_STARTER_SKIP_NOTARIZE);
 
 const RELEASE_DOWNLOADS =
   "https://github.com/shallinta/electrobun-app-starter/releases/download";
 const updateBaseUrl =
-  Bun.env.ELECTROBUN_APP_STARTER_UPDATE_BASE_URL ??
+  process.env.ELECTROBUN_APP_STARTER_UPDATE_BASE_URL ??
   `${RELEASE_DOWNLOADS}/updates`;
 const macRendererConfig = resolveMacRendererConfig({
-  renderer: Bun.env.ELECTROBUN_APP_STARTER_DESKTOP_RENDERER,
-  cdpPort: Bun.env.ELECTROBUN_APP_STARTER_CDP_PORT,
+  renderer: process.env.ELECTROBUN_APP_STARTER_DESKTOP_RENDERER,
+  cdpPort: process.env.ELECTROBUN_APP_STARTER_CDP_PORT,
 });
 
 export default {
@@ -31,6 +31,10 @@ export default {
     version: packageJson.version,
   },
   build: {
+    // Preserve the Bun main process while adopting Electrobun 2's Hutch build
+    // orchestration. Migrating to Cottontail is a separate product decision.
+    mainProcess: "bun",
+    bun: { entrypoint: "src/bun/index.ts" },
     // Vite builds to dist/; imported assets are copied with their hashes.
     copy: {
       "dist/index.html": "views/mainview/index.html",
@@ -44,7 +48,7 @@ export default {
       codesign: !skipSigning,
       notarize: !skipNotarize,
       ...macRendererConfig,
-      icons: "icon.iconset",
+      icons: "AppIcon.icon",
     },
     linux: {
       bundleCEF: false,
@@ -54,10 +58,6 @@ export default {
     },
   },
   scripts: {
-    // Both run right before their respective codesign step. Workaround for
-    // electrobun#485 (x64-only, no-op elsewhere); see the script header.
-    postBuild: "scripts/fix-x64-headerpad.ts",
-    postWrap: "scripts/fix-x64-headerpad.ts",
     // Electrobun appends "-dev" to CFBundleName; keep the development display
     // name aligned with app.name without changing the generated bundle path.
     postPackage: "scripts/fix-dev-display-name.ts",

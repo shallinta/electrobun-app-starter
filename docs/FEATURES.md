@@ -152,11 +152,11 @@
 
 ### 打包与发布流水线
 
-- **功能：** 为 arm64/x64 构建、签名、公证、生成更新 feed，并以版本提交和 tag 原子发布 stable 或 canary。
+- **功能：** 为 Apple Silicon arm64 构建、签名、公证、生成更新 feed，并以版本提交和 tag 原子发布 stable 或 canary。Electrobun 2.x 当前不发布 macOS x64 core，因此默认流水线不再生成 Intel 产物。
 - **使用场景：** 下游产品需要可重复、可校验的 macOS 交付流程。
 - **外壳状态：** 已接入本地打包任务、release preflight 与 GitHub release workflow。
-- **接入方式：** 首次发布前完成 bundle ID、图标、证书、App Store Connect、仓库 URL 和 feed 品牌替换；不要绕过 preflight 或单独推送 release tag。
-- **代码位置：** `scripts/release.ts`、`.github/workflows/release.yml`、`apps/desktop/electrobun.config.ts`
+- **接入方式：** 首次发布前完成 bundle ID、Icon Composer `.icon`、证书、App Store Connect、仓库 URL 和 feed 品牌替换；图标打包必须使用完整 Xcode 26+ 的 `actool`，不要绕过 preflight 或单独推送 release tag。
+- **代码位置：** `scripts/release.ts`、`.github/workflows/release.yml`、`apps/desktop/electrobun.config.ts`、`apps/desktop/AppIcon.icon`
 
 ## 未接入 / 未来可选
 

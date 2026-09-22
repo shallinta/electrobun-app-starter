@@ -58,7 +58,7 @@ export interface NativeFileCapabilities {
 async function _openFileDialog(
   options: NativeFileDialogOptions
 ): Promise<readonly string[]> {
-  const { Utils } = await import("electrobun/bun");
+  const { Utils } = await import("electrobun/main");
 
   return Utils.openFileDialog(options);
 }

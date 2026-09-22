@@ -25,8 +25,8 @@ embedded Chromium edition.
   command; downstream apps mount custom title-bar UI only when needed.
 - An internationalized shell with live `en-US`/`zh-CN` switching and Bun-owned
   locale persistence, plus theme, primary-color, update, and about settings.
-- Automatic-update infrastructure and macOS release workflows for Apple
-  Silicon and Intel.
+- Automatic-update infrastructure and a macOS release workflow for Apple
+  Silicon.
 - An opt-in local CEF/CDP diagnostic command; normal development and every
   release build continue to use the system WebView.
 - A shared UI package with Tailwind CSS and shadcn/ui primitives.
@@ -47,7 +47,9 @@ example, remain disconnected.
 
 ## Requirements
 
-- macOS
+- Apple Silicon Mac (Electrobun 2.x does not currently publish a macOS x64 core)
+- A full Xcode 26 or newer installation (`actool` is required to package the
+  Icon Composer `.icon`; Command Line Tools alone are insufficient)
 - [mise](https://mise.jdx.dev) (recommended)
 - [Bun](https://bun.com) if you do not use mise
 
@@ -177,10 +179,12 @@ production values for your product.
 
 #### Brand and application identity
 
-- [ ] Replace every PNG in `apps/desktop/icon.iconset`. Keep the existing
-      macOS iconset filenames and dimensions, and confirm
-      `build.mac.icons: "icon.iconset"` in
-      `apps/desktop/electrobun.config.ts` still points to it.
+- [ ] Replace the artwork in `apps/desktop/AppIcon.icon` with Xcode's Icon
+      Composer and inspect the macOS Default, Dark, and Mono appearances.
+      Confirm `build.mac.icons: "AppIcon.icon"` in
+      `apps/desktop/electrobun.config.ts` still points to that document. The
+      `.icon` build requires a full Xcode installation with `actool`; Command
+      Line Tools alone are insufficient.
 - [ ] Change the application name in
       `apps/desktop/electrobun.config.ts` (`app.name`, currently
       `Electrobun App Starter`) and all user-visible copies in

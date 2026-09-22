@@ -94,8 +94,10 @@ Complete these checklist groups before the first public release:
 
 ### 2. Validate the release path in order
 
-Rerun the local gates first, then validate unsigned packaging and the release
-preflight:
+First install a full Xcode 26+ toolchain and select it with `xcode-select`.
+Packaging the Icon Composer `.icon` requires its `actool`; Command Line Tools
+alone are insufficient. Then rerun the local gates and validate unsigned
+packaging and the release preflight:
 
 ```bash
 mise run check:feature-docs
@@ -108,6 +110,6 @@ mise run release -- --dry-run
 ```
 
 Run `mise run pack:adhoc` afterward when a local signing-path rehearsal is
-useful. After the real release, require both architecture builds, signing,
-notarization, and launch checks in the release workflow to pass before accepting
-installation and updates from GitHub Releases.
+useful. After the real release, require the arm64 build, signing, notarization,
+and launch checks in the release workflow to pass before accepting installation
+and updates from GitHub Releases.

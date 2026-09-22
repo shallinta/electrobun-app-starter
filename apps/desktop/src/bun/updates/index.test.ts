@@ -6,7 +6,7 @@ import {
   fakeUpdater as nativeUpdater,
 } from "../test-electrobun-mock";
 
-await mock.module("electrobun/bun", () => electrobunBunMock);
+await mock.module("electrobun/main", () => electrobunBunMock);
 
 const { UpdaterService } = await import("./index");
 

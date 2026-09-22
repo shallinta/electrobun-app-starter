@@ -4,7 +4,7 @@ name: Release
 # which bumps apps/desktop/package.json, commits and tags).
 # A `-canary` suffix in the tag selects the canary channel; otherwise stable.
 #
-# Jobs: meta (validate tag) → build (macOS arm64 + x64 matrix: sign, notarize,
+# Jobs: meta (validate tag) → build (macOS arm64: sign, notarize,
 # smoke-test) → publish. Artifacts land in two places:
 #   - the rolling `updates` release — the machine-readable update feed the
 #     in-app updater polls (`release.baseUrl` in electrobun.config.ts)
@@ -88,8 +88,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - { runner: macos-15, arch: arm64, edition: regular }
-          - { runner: macos-15-intel, arch: x64, edition: regular }
+          # `.icon` assets require Icon Composer's actool pipeline. macos-26
+          # provides a complete Xcode 26+ toolchain by default.
+          - { runner: macos-26, arch: arm64, edition: regular }
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 90
     steps:
@@ -177,10 +178,9 @@ jobs:
           # The bundle left in build/ is the self-extracting installer wrapper
           # (the real app only exists inside the tar.zst): on first launch it
           # swaps the real app into the same bundle path and relaunches it. This
-          # check must observe the *relaunched* app — a signed-but-corrupted
-          # binary dies instantly (electrobun#485 on x64), and this launch is the
-          # only regression gate on scripts/fix-x64-headerpad.ts, since codesign
-          # --verify / spctl / stapler all pass on a corrupted-but-signed binary.
+          # check must observe the *relaunched* app rather than merely the
+          # extractor, because codesign / spctl / stapler do not prove that the
+          # installed application can finish booting.
           #
           # Do NOT go back to a fixed `sleep`: the extractor itself runs from
           # $APP/Contents/MacOS/, so a bare pgrep on that path is satisfied by
@@ -251,8 +251,7 @@ jobs:
                 || gh release view "$release" --repo "$GITHUB_REPOSITORY" > /dev/null
             fi
             # Upload order is load-bearing: update.json is the update trigger and
-            # must land last, after the patches and tarballs it points at —
-            # across both architectures.
+            # must land last, after the patches and tarballs it points at.
             (
               cd "$dir"
               shopt -s nullglob
@@ -269,10 +268,9 @@ jobs:
         env:
           TAG: ${{ needs.meta.outputs.tag }}
         run: |
-          # electrobun names DMGs `{channel}-macos-{arch}-{AppName}.dmg`
-          # (e.g. stable-macos-arm64-ElectrobunAppStarter.dmg). Humans download
-          # these from the versioned release, so give them a stable,
-          # channel-free scheme:
+          # Electrobun 2 names stable DMGs `macos-{arch}-{AppName}.dmg` and
+          # canary DMGs `canary-macos-{arch}-{AppName}.dmg`. Humans download
+          # these from the versioned release, so give both a stable scheme:
           #   ElectrobunAppStarter-{vX.Y.Z}-macos-{arch}.dmg
           # version (the tag, so it keeps the `v`), os and arch are all lowercase.
           # This runs AFTER the update feeds are published and only touches *.dmg,
@@ -283,8 +281,11 @@ jobs:
             local dir="$1" prefix="$2"
             shopt -s nullglob
             for f in "$dir"/*.dmg; do
-              # Third dash-delimited field of the electrobun name is the arch.
-              arch="$(basename "$f" | sed -E 's/^[^-]+-macos-([^-]+)-.*/\1/')"
+              arch="$(basename "$f" | sed -E 's/.*macos-(arm64|x64)-.*/\1/')"
+              if [ "$arch" != "arm64" ] && [ "$arch" != "x64" ]; then
+                echo "::error::could not derive architecture from $f"
+                exit 1
+              fi
               mv "$f" "$dir/$prefix-$VLOWER-macos-$arch.dmg"
             done
           }

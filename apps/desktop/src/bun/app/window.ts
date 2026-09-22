@@ -6,7 +6,7 @@ import {
   getWindowZoom,
   loadWindowState,
 } from "@shallinta/shared/server";
-import { BrowserWindow, Updater } from "electrobun/bun";
+import { BrowserWindow, Updater } from "electrobun/main";
 
 import type { Command } from "../../shared/commands";
 import type { MainWindowRPC } from "../rpc";

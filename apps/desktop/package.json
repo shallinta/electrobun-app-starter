@@ -2,14 +2,16 @@
   "name": "@shallinta/desktop",
   "version": "0.1.0",
   "scripts": {
-    "start": "vite build && electrobun dev",
-    "dev:watch": "electrobun dev --watch",
-    "dev:hmr": "concurrently \"bun run hmr\" \"bun run start\"",
+    "prepare:electrobun": "electrobun prepare",
+    "start": "bun run prepare:electrobun && vite build && electrobun dev",
+    "dev:watch": "bun run prepare:electrobun && electrobun dev --watch",
+    "dev:hmr": "bun run prepare:electrobun && concurrently \"vite --port 5173\" \"vite build && electrobun dev\"",
     "dev:cef": "ELECTROBUN_APP_STARTER_DESKTOP_RENDERER=cef ELECTROBUN_APP_STARTER_CDP_PORT=9222 bun run dev:hmr",
-    "hmr": "vite --port 5173",
-    "build:view": "NODE_OPTIONS=--max-old-space-size=4096 vite build",
+    "hmr": "bun run prepare:electrobun && vite --port 5173",
+    "build:view": "bun run prepare:electrobun && NODE_OPTIONS=--max-old-space-size=4096 vite build",
     "build:canary": "bun run build:view && ELECTROBUN_APP_STARTER_DESKTOP_RENDERER=system ELECTROBUN_APP_STARTER_CDP_PORT= electrobun build --env=canary",
-    "build:stable": "bun run build:view && ELECTROBUN_APP_STARTER_DESKTOP_RENDERER=system ELECTROBUN_APP_STARTER_CDP_PORT= electrobun build --env=stable"
+    "build:stable": "bun run build:view && ELECTROBUN_APP_STARTER_DESKTOP_RENDERER=system ELECTROBUN_APP_STARTER_CDP_PORT= electrobun build --env=stable",
+    "typecheck": "bun run prepare:electrobun && tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
     "@dayflow/blossom-color-picker-react": "^1.2.1",
@@ -17,7 +19,6 @@
     "@fontsource-variable/geist-mono": "^5.2.8",
     "@shallinta/shared": "workspace:*",
     "@shallinta/ui": "workspace:*",
-    "electrobun": "^1.18.1",
     "i18next": "^26.3.6",
     "lucide-react": "^1.22.0",
     "react": "catalog:",
@@ -32,9 +33,10 @@
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
     "concurrently": "^9.1.0",
+    "electrobun": "^2.0.1",
     "postcss": "^8.5.3",
     "tailwindcss": "^4.0.15",
-    "typescript": "^5.7.2",
+    "typescript": "^6.0.3",
     "vite": "^6.0.3"
   }
 }

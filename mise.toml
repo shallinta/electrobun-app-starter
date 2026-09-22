@@ -27,8 +27,9 @@ _.path = "node_modules/.bin"
 [tasks.setup]
 description = "One-shot bootstrap for a fresh clone: install tools + JS deps"
 # `mise install` provisions the locked toolchain (bun via mise.lock); the bun
-# install then pulls JS deps and runs husky's `prepare` hook.
-run = ["mise install", "bun install"]
+# install then pulls JS deps, runs husky's `prepare` hook, and projects the
+# Electrobun SDK needed by TypeScript and Vite.
+run = ["mise install", "bun install", "bun run --cwd apps/desktop prepare:electrobun"]
 
 [tasks.dev]
 description = "Run the desktop app (Vite HMR on :5173; restart to pick up bun-process changes)"

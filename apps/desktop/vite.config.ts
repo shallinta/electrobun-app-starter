@@ -3,15 +3,18 @@ import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
+import { electrobunViteAliases } from "./.hutch/devkit/api/config/electrobun-vite";
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   plugins: [react()],
   root: "src/mainview",
   resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "src"),
-    },
+    alias: [
+      { find: "@", replacement: path.resolve(__dirname, "src") },
+      ...electrobunViteAliases(path.resolve(__dirname, ".hutch/devkit")),
+    ],
     // react/react-dom are deduped so the shared `@shallinta/ui` package and the
     // app resolve the same React copy (else hooks throw "invalid hook call").
     dedupe: ["react", "react-dom"],

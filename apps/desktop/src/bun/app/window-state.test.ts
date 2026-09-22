@@ -4,7 +4,7 @@ import type { WindowFrame } from "@shallinta/shared/server";
 
 import { electrobunBunMock } from "../test-electrobun-mock";
 
-await mock.module("electrobun/bun", () => electrobunBunMock);
+await mock.module("electrobun/main", () => electrobunBunMock);
 
 const windowStateModule = await import("./window-state");
 

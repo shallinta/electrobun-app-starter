@@ -1,4 +1,4 @@
-import { BrowserView, type BrowserWindow } from "electrobun/bun";
+import { BrowserView, type BrowserWindow } from "electrobun/main";
 
 import type { Command } from "../../shared/commands";
 import type { DesktopRPCType } from "../../shared/rpc";

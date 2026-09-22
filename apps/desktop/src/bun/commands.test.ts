@@ -2,7 +2,7 @@ import { describe, expect, mock, spyOn, test } from "bun:test";
 
 import { electrobunBunMock } from "./test-electrobun-mock";
 
-await mock.module("electrobun/bun", () => electrobunBunMock);
+await mock.module("electrobun/main", () => electrobunBunMock);
 
 const { executeCommandInBun } = await import("./commands");
 

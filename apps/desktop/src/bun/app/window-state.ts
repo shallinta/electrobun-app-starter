@@ -5,7 +5,7 @@ import {
   saveWindowZoom,
   type WindowFrame,
 } from "@shallinta/shared/server";
-import { app, type BrowserWindow } from "electrobun/bun";
+import { app, type BrowserWindow } from "electrobun/main";
 
 const SAVE_DEBOUNCE_MS = 300;
 

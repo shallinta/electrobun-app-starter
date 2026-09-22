@@ -8,7 +8,7 @@ import {
   setFakeBrowserWindowFullScreen,
 } from "../test-electrobun-mock";
 
-await mock.module("electrobun/bun", () => electrobunBunMock);
+await mock.module("electrobun/main", () => electrobunBunMock);
 
 const { createMainWindow } = await import("./window");
 

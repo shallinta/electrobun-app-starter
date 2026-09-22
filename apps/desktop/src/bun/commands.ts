@@ -1,4 +1,4 @@
-import type { BrowserWindow } from "electrobun/bun";
+import type { BrowserWindow } from "electrobun/main";
 
 import { COMMAND_META, type Command } from "../shared/commands";
 

@@ -15,6 +15,7 @@ export default defineConfig([
       "**/dist/**",
       "**/build/**",
       "**/.next/**",
+      "**/.hutch/**",
       "**/.turbo/**",
       ".agents/**",
       ".electrobun-app-starter/**",

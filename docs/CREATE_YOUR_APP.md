@@ -71,7 +71,8 @@ rg -n 'shallinta|electrobun-app-starter|Electrobun App Starter|ElectrobunAppStar
 
 ### 2. 按顺序验证发布链路
 
-先重跑本地门禁，再验证无签名打包和 release preflight：
+先确认已安装并通过 `xcode-select` 选中完整 Xcode 26+；Icon Composer
+`.icon` 打包依赖其中的 `actool`，仅安装 Command Line Tools 不够。然后重跑本地门禁，再验证无签名打包和 release preflight：
 
 ```bash
 mise run check:feature-docs
@@ -83,4 +84,4 @@ mise run pack
 mise run release -- --dry-run
 ```
 
-需要预演本地签名路径时，再运行 `mise run pack:adhoc`。真实发布后，要求 release workflow 的两种架构构建、签名、公证和启动检查全部通过，再从 GitHub Release 验收安装与更新。
+需要预演本地签名路径时，再运行 `mise run pack:adhoc`。真实发布后，要求 release workflow 的 arm64 构建、签名、公证和启动检查全部通过，再从 GitHub Release 验收安装与更新。

@@ -26,8 +26,12 @@ product-specific permissions may wait until the first release.
 
 `mise` is the task front door: `mise tasks ls` lists every supported workflow.
 Task bodies normally forward to scripts in `package.json`. Bun is both the
-package manager and JavaScript runtime. Its compatible version is declared in
-`mise.toml`, while the exact toolchain is locked in `mise.lock`.
+package manager and application main-process runtime. Electrobun 2 delegates
+build orchestration and SDK projection to Hutch; `hutch.config.ts` keeps Bun as
+the package manager, and generated `.hutch/devkit` state is ignored. The
+installed `electrobun` dependency and `bun.lock` select the paired Electrobun
+and Hutch release. Bun's compatible version is declared in `mise.toml`, while
+the exact local toolchain is locked in `mise.lock`.
 
 Do not use npm, pnpm, or Yarn.
 
@@ -123,7 +127,8 @@ The release script supports these remote states:
 
 `mise run release` and `mise run release:canary` use
 `commit-and-tag-version`, then atomically push `main` and its tags. Release
-workflows build macOS arm64 and x64 artifacts. Never bypass release preflight
+workflows build macOS arm64 artifacts. Electrobun 2.x does not currently
+publish a macOS x64 core. Never bypass release preflight
 checks or push a release tag independently.
 
 For local packaging, these environment variables are supported:
@@ -151,7 +156,10 @@ keys. The synchronous pre-React appearance bootstrap in
 primary-color keys change, update its explicitly documented mirror literals in
 the same change.
 
-The application icon lives in `apps/desktop/icon.iconset`.
+The application icon source lives in `apps/desktop/AppIcon.icon`. Edit it with
+Xcode's Icon Composer. Electrobun compiles it with `actool`, so packaging
+requires a full Xcode 26 or newer installation rather than Command Line Tools
+alone.
 
 ## Localization
 

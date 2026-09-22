@@ -4,7 +4,7 @@ import Electrobun, {
   type BrowserWindow,
   type ElectrobunEvent,
   Utils,
-} from "electrobun/bun";
+} from "electrobun/main";
 
 import type { Command } from "../../shared/commands";
 import { executeCommandInBun } from "../commands";

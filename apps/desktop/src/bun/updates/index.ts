@@ -1,4 +1,4 @@
-import { Updater } from "electrobun/bun";
+import { Updater } from "electrobun/main";
 
 import type { UpdateMode, UpdateStatus } from "../../shared/updates";
 import { setUpdateModeInMenu, setUpdateReadyInMenu } from "../app/menu";

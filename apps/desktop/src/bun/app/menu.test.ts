@@ -8,7 +8,7 @@ import {
 let applicationMenuListener:
   ((event: { data: { action: string } }) => void) | undefined;
 
-await mock.module("electrobun/bun", () => ({
+await mock.module("electrobun/main", () => ({
   ...electrobunBunMock,
   ApplicationMenu: {
     ...electrobunBunMock.ApplicationMenu,

@@ -1,3 +1,4 @@
+import { spawnSync } from "node:child_process";
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
 
@@ -41,43 +42,36 @@ function _findAppBundle(buildDir: string): string {
 }
 
 function _readBundleName(infoPlistPath: string): string {
-  const result = Bun.spawnSync(
-    [PLUTIL_PATH, "-extract", "CFBundleName", "raw", "-o", "-", infoPlistPath],
+  const result = spawnSync(
+    PLUTIL_PATH,
+    ["-extract", "CFBundleName", "raw", "-o", "-", infoPlistPath],
     {
-      stdout: "pipe",
-      stderr: "pipe",
+      encoding: "utf8",
     }
   );
 
-  if (result.exitCode !== 0) {
+  if (result.error || result.status !== 0) {
     throw new Error(
       "fix-dev-display-name: could not read CFBundleName from Info.plist."
     );
   }
 
-  const value = result.stdout.toString();
+  const value = result.stdout;
   if (value.endsWith("\r\n")) return value.slice(0, -2);
   if (value.endsWith("\n")) return value.slice(0, -1);
   return value;
 }
 
 function _writeBundleName(infoPlistPath: string, displayName: string): void {
-  const result = Bun.spawnSync(
-    [
-      PLUTIL_PATH,
-      "-replace",
-      "CFBundleName",
-      "-string",
-      displayName,
-      infoPlistPath,
-    ],
+  const result = spawnSync(
+    PLUTIL_PATH,
+    ["-replace", "CFBundleName", "-string", displayName, infoPlistPath],
     {
-      stdout: "pipe",
-      stderr: "pipe",
+      encoding: "utf8",
     }
   );
 
-  if (result.exitCode !== 0) {
+  if (result.error || result.status !== 0) {
     throw new Error(
       "fix-dev-display-name: could not update CFBundleName in Info.plist."
     );

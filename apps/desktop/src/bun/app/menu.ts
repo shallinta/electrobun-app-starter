@@ -2,7 +2,7 @@ import {
   ApplicationMenu,
   type ApplicationMenuItemConfig,
   type BrowserWindow,
-} from "electrobun/bun";
+} from "electrobun/main";
 
 import type { Command } from "../../shared/commands";
 import type { SupportedLocale } from "../../shared/i18n";

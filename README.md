@@ -20,7 +20,7 @@
 - 原生窗口与菜单管理、窗口状态持久化、可折叠侧栏，以及安全的外部链接处理。
 - 全屏状态 RPC、渲染端订阅基础和最大化命令；自定义标题栏 UI 由下游应用按需挂载。
 - 支持 `en-US`/`zh-CN` 动态切换且由 Bun 持久化语言偏好的国际化外壳，以及主题、主色、软件更新和关于设置。
-- 自动更新基础设施，以及面向 Apple Silicon 和 Intel 的 macOS 发布工作流。
+- 自动更新基础设施，以及面向 Apple Silicon 的 macOS 发布工作流。
 - 可选的本地 CEF/CDP 诊断命令；默认开发和所有发行构建仍使用系统 WebView。
 - 基于 Tailwind CSS 和 shadcn/ui primitives 的共享 UI 包。
 - Bun 测试、TypeScript 检查、ESLint、Prettier、Husky 和 GitHub Actions。
@@ -35,7 +35,8 @@
 
 ## 环境要求
 
-- macOS
+- Apple Silicon Mac（Electrobun 2.x 当前不提供 macOS x64 core）
+- 完整安装 Xcode 26 或更高版本（Icon Composer `.icon` 打包需要 `actool`，仅安装 Command Line Tools 不够）
 - 推荐安装 [mise](https://mise.jdx.dev)
 - 不使用 mise 时需要安装 [Bun](https://bun.com)
 
@@ -147,10 +148,11 @@ RPC 和命令边界扩展原生能力。
 
 #### 品牌与应用身份
 
-- [ ] 替换 `apps/desktop/icon.iconset` 中的全部 PNG。保留现有 macOS
-      iconset 文件名和尺寸，并确认
-      `apps/desktop/electrobun.config.ts` 中的
-      `build.mac.icons: "icon.iconset"` 仍然指向该目录。
+- [ ] 使用 Xcode 自带的 Icon Composer 替换
+      `apps/desktop/AppIcon.icon` 中的图标源图，并检查 macOS 的 Default、Dark
+      与 Mono 外观。确认 `apps/desktop/electrobun.config.ts` 中的
+      `build.mac.icons: "AppIcon.icon"` 仍然指向该文档；`.icon` 打包依赖完整
+      Xcode 的 `actool`，不能只安装 Command Line Tools。
 - [ ] 修改 `apps/desktop/electrobun.config.ts` 中的应用名称（`app.name`，当前为
       `Electrobun App Starter`），并同步替换
       `apps/desktop/src/mainview/index.html`、
